@@ -1,10 +1,10 @@
 import configparser
-import time
 from os import path
 
-import updater
-import src.gui.window as window
 import ttkbootstrap as ttb
+
+import src.gui.window as window
+import updater
 
 settings = configparser.ConfigParser()
 settings.read("data/settings.ini")
