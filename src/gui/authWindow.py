@@ -46,7 +46,6 @@ def runAuthWindow(root, callback):
 
             if "hwid" in accountResponseData:
                 if accountResponseData["hwid"] == userHWID:
-
                     updateResponse = requests.put(url="%s%s%s" % (URL, "/api/users/", userId),
                                                   data={"hwid": "%s" % userHWID},
                                                   headers=HEADERS)
