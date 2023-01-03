@@ -45,7 +45,7 @@ def runUpdater(root):
     root.update_idletasks()
     root.update()
 
-    if getenv("devmode") is None:
+    if getenv("devmode") == "True":
         currentVersionTag = settings["settings"]["version"]
         currentVersionTagSplit = currentVersionTag.split(".")
         currentVersion = currentVersionTagSplit[0]
@@ -148,13 +148,13 @@ def runUpdater(root):
 
             print("Extracted new version.")
 
-            if path.exists("temp/src/"):
-                shutil.rmtree("temp/src/")
+            if path.exists("src/"):
+                shutil.rmtree("src/")
 
             print("Copying download src directory contents to local src directory.")
 
             source_folder = r"downloads/Autobot/src/"
-            destination_folder = r"temp/src/"
+            destination_folder = r"src/"
 
             shutil.copytree(source_folder, destination_folder)
 
