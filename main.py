@@ -1,17 +1,30 @@
-from src.gui.window import *
-from src.scripts.silentShot import *
-from src.scripts.slideCancel import *
-from src.scripts.toggler import *
+import configparser
+import time
+from os import path
+
+import updater
+import src.gui.window as window
+import ttkbootstrap as ttb
+
+settings = configparser.ConfigParser()
+settings.read("data/settings.ini")
 
 if __name__ == '__main__':
-    print("Initializing scripts.")
+    root = ttb.Window(themename=settings["settings"]["theme"])
+    root.title("Autobot v0.0.5")
+    iconFile = path.join("src", "assets", "logo.ico")
+    root.iconbitmap(iconFile)
 
-    initializeSilentShot()
-    initializeSlideCancel()
-    initializeToggler()
+    root.overrideredirect(True)
+
+    print("Running updater.")
+
+    updater.runUpdater(root)
 
     print("Running window.")
 
-    runWindow()
+    root.overrideredirect(False)
+
+    window.runWindow(root)
 
     print("Application has finished.")
