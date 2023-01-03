@@ -70,6 +70,9 @@ def runUpdater(root):
     print("Latest Version: %s, Major: %s, Minor: %s" % (version, versionMajor, versionMinor))
 
     if version > currentVersion or versionMajor > currentVersionMajor or versionMinor > currentVersionMinor:
+        if not path.exists("downloads/"):
+            mkdir("downloads/")
+
         updaterLabel.destroy()
 
         updaterLabel = ttb.Label(master=updaterFrame, text="Downloading update", font=("Impact", 13))
@@ -115,9 +118,6 @@ def runUpdater(root):
 
                     root.update_idletasks()
                     root.update()
-
-        if not path.exists("downloads/"):
-            mkdir("downloads/")
 
         updaterLabel.destroy()
 
