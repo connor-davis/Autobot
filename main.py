@@ -11,7 +11,7 @@ settings.read("data/settings.ini")
 
 if __name__ == '__main__':
     root = ttb.Window(themename=settings["settings"]["theme"])
-    root.title("Autobot v0.0.5")
+    root.title("Autobot v%s" % settings["settings"]["version"])
     iconFile = path.join("src", "assets", "logo.ico")
     root.iconbitmap(iconFile)
 
