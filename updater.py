@@ -66,13 +66,6 @@ def runUpdater(root):
     versionMajor = versionTagSplit[1]
     versionMinor = versionTagSplit[2]
 
-    settings.read("data/settings.ini")
-
-    settings["settings"]["version"] = versionTag
-
-    with open('data/settings.ini', 'w') as configfile:
-        settings.write(configfile)
-
     print("Current Version: %s, Major: %s, Minor: %s" % (currentVersion, currentVersionMajor, currentVersionMinor))
     print("Latest Version: %s, Major: %s, Minor: %s" % (version, versionMajor, versionMinor))
 
@@ -158,6 +151,13 @@ def runUpdater(root):
         shutil.copytree(source_folder, destination_folder)
 
         print("Update has been completed.")
+
+        settings.read("data/settings.ini")
+
+        settings["settings"]["version"] = versionTag
+
+        with open('data/settings.ini', 'w') as configfile:
+            settings.write(configfile)
 
         updaterLabel = ttb.Label(master=updaterFrame, text="Update finished.", font=("Impact", 13))
         updaterLabel.pack()
