@@ -41,19 +41,24 @@ def runAuthWindow(root, callback):
 
             HEADERS = {"Authorization": "Bearer %s" % authData["jwt"]}
 
-            updateResponse = requests.put(url="%s%s%s" % (URL, "/api/users/", userId), data={"hwid": "%s" % userHWID},
-                                          headers=HEADERS)
-            updateResponseData = updateResponse.json()
+            accountResponse = requests.get(url="%s%s%s" % (URL, "/api/users/", userId), headers=HEADERS)
+            accountResponseData = accountResponse.json()
 
-            if "paid" in updateResponseData:
-                if updateResponseData["paid"] is True:
-                    if "hwid" in updateResponseData:
-                        if updateResponseData["hwid"] == userHWID:
+            if "hwid" in accountResponseData:
+                if accountResponseData["hwid"] == userHWID:
+
+                    updateResponse = requests.put(url="%s%s%s" % (URL, "/api/users/", userId),
+                                                  data={"hwid": "%s" % userHWID},
+                                                  headers=HEADERS)
+                    updateResponseData = updateResponse.json()
+
+                    if "paid" in updateResponseData:
+                        if updateResponseData["paid"] is True:
                             authFrame.destroy()
                             callback(root)
                         else:
                             md = MessageDialog(parent=root, title="Autobot Message",
-                                               message="Invalid account HWID.",
+                                               message="You have not paid for your license.",
                                                buttons=["Ok"])
                             md.show()
 
@@ -61,7 +66,7 @@ def runAuthWindow(root, callback):
                             exit()
                 else:
                     md = MessageDialog(parent=root, title="Autobot Message",
-                                       message="You have not paid for your license.",
+                                       message="Invalid account HWID.",
                                        buttons=["Ok"])
                     md.show()
 
