@@ -47,8 +47,18 @@ def runAuthWindow(root, callback):
 
             if "paid" in updateResponseData:
                 if updateResponseData["paid"] is True:
-                    authFrame.destroy()
-                    callback(root)
+                    if "hwid" in updateResponseData:
+                        if updateResponseData["hwid"] == userHWID:
+                            authFrame.destroy()
+                            callback(root)
+                        else:
+                            md = MessageDialog(parent=root, title="Autobot Message",
+                                               message="Invalid account HWID.",
+                                               buttons=["Ok"])
+                            md.show()
+
+                            authFrame.destroy()
+                            exit()
                 else:
                     md = MessageDialog(parent=root, title="Autobot Message",
                                        message="You have not paid for your license.",
