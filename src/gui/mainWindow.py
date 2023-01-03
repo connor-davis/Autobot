@@ -120,6 +120,9 @@ def runMainWindow(root):
 
     frameSettings = ttb.Frame(notebookConfiguration, padding=5)
 
+    targetGameLabel = ttb.Label(master=frameSettings, text="Target Game")
+    targetGameLabel.pack(fill=X, pady=5, padx=5)
+
     targetGameCombobox = ttb.Combobox(master=frameSettings, values=['Modern Warfare', 'Modern Warfare 2'],
                                       bootstyle="success")
 
@@ -143,6 +146,9 @@ def runMainWindow(root):
         entrySlideCancelCancelKey.configure(state="success")
 
     targetGameCombobox.pack(fill=X, pady=5, padx=5)
+
+    themeLabel = ttb.Label(master=frameSettings, text="App Theme")
+    themeLabel.pack(fill=X, pady=5, padx=5)
 
     themeCombobox = ttb.Combobox(master=frameSettings, values=["darkly", "vapor", "flatly", "pulse"],
                                  bootstyle="success")
