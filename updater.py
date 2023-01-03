@@ -160,13 +160,13 @@ def runUpdater(root):
 
             print("Update has been completed.")
 
-        updaterLabel = ttb.Label(master=updaterFrame, text="Update finished.", font=("Impact", 13))
-        updaterLabel.pack()
+            updaterLabel = ttb.Label(master=updaterFrame, text="Update finished.", font=("Impact", 13))
+            updaterLabel.pack()
 
-        updaterFrame.pack()
+            updaterFrame.pack()
 
-        root.update_idletasks()
-        root.update()
+            root.update_idletasks()
+            root.update()
 
     updaterFrame.destroy()
 
