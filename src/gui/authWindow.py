@@ -1,6 +1,7 @@
 import getpass
 import hashlib
 import os
+import sys
 import uuid
 
 import getmac as gma
@@ -10,7 +11,7 @@ from ttkbootstrap.constants import *
 from ttkbootstrap.dialogs import MessageDialog
 
 userHWID = hashlib.sha256(
-    (os.name + getpass.getuser() + gma.get_mac_address() + str(hex(uuid.getnode()))).encode()).hexdigest()
+    (os.name + getpass.getuser() + str(hex(uuid.getnode()))).encode()).hexdigest()
 
 
 def runAuthWindow(root, callback):
@@ -62,7 +63,8 @@ def runAuthWindow(root, callback):
                             md.show()
 
                             authFrame.destroy()
-                            exit()
+                            root.destroy()
+                            sys.exit(0)
                 else:
                     md = MessageDialog(parent=root, title="Autobot Message",
                                        message="Invalid account HWID.",
@@ -70,14 +72,16 @@ def runAuthWindow(root, callback):
                     md.show()
 
                     authFrame.destroy()
-                    exit()
+                    root.destroy()
+                    sys.exit(0)
         else:
             md = MessageDialog(parent=root, title="Autobot Message", message=authData["error"]["message"],
                                buttons=["Ok"])
             md.show()
 
             authFrame.destroy()
-            exit()
+            root.destroy()
+            sys.exit(0)
 
     emailLabel = ttb.Label(master=authFrame, text="Email")
     emailLabel.pack(pady=5, padx=5, fill=X, expand=True)
