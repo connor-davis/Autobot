@@ -1,6 +1,8 @@
-from tkinter import IntVar
+import threading
+from tkinter import IntVar, StringVar
 
 import ttkbootstrap as ttb
+from pynput.keyboard import KeyCode
 from ttkbootstrap.constants import *
 
 from src.scripts.toggler import *
@@ -37,7 +39,14 @@ def toggleExitScope():
         exitScopeAfterSilentShot = True
 
 
+job = None
+listenerKeyboard = None
+entrySilentShotLethalKey = None
+
+
 def runMainWindow(root):
+    global entrySilentShotLethalKey
+
     labelHeading = ttb.Label(text="Autobot Macros", font=("Impact", 24))
     labelHeading.pack(pady=10, padx=10)
 
@@ -53,16 +62,64 @@ def runMainWindow(root):
     labelSilentShotLethalKey = ttb.Label(master=frameSilentShot, text="Lethal Key, e.g. f")
     labelSilentShotLethalKey.pack(fill=X, expand=True, pady=5, padx=5)
 
-    entrySilentShotLethalKey = ttb.Entry(master=frameSilentShot, style="success")
-    entrySilentShotLethalKey.insert(0, silentShotLethalKey)
-    entrySilentShotLethalKey.pack(fill=X, expand=True, pady=5, padx=5)
+    btnSilentShotLethalKeyText = StringVar()
+
+    def getLethalKey():
+        global listenerKeyboard
+
+        if listenerKeyboard is not None:
+            listenerKeyboard = None
+
+        listenerKeyboard = keyboard.Listener(on_press=handleLethalPress)
+        listenerKeyboard.start()
+
+    def handleLethalPress(key):
+        global listenerKeyboard, job
+
+        keyBind = "{0}".format(key).replace("'", "").replace("Key.", "")
+
+        btnSilentShotLethalKeyText.set(keyBind)
+
+        root.update_idletasks()
+        root.update()
+
+        listenerKeyboard.stop()
+
+    btnSilentShotLethalKeyText.set(silentShotLethalKey)
+    entrySilentShotLethalKey = ttb.Button(master=frameSilentShot, style="success-outline",
+                                          textvariable=btnSilentShotLethalKeyText, command=getLethalKey)
+    entrySilentShotLethalKey.pack(fill=X, expand=True, pady=5, padx=5, anchor=W)
 
     labelSilentShotWeaponSwap = ttb.Label(master=frameSilentShot, text="Weapon Swap Key, e.g. 1")
     labelSilentShotWeaponSwap.pack(fill=X, expand=True, pady=5, padx=5)
 
-    entrySilentShotWeaponSwap = ttb.Entry(master=frameSilentShot, style="success")
-    entrySilentShotWeaponSwap.insert(0, silentShotWeaponSwapKey)
-    entrySilentShotWeaponSwap.pack(fill=X, expand=True, pady=5, padx=5)
+    btnSilentShotWeaponSwapKeyText = StringVar()
+
+    def getWeaponSwapKey():
+        global listenerKeyboard
+
+        if listenerKeyboard is not None:
+            listenerKeyboard = None
+
+        listenerKeyboard = keyboard.Listener(on_press=handleActivatorPress)
+        listenerKeyboard.start()
+
+    def handleActivatorPress(key):
+        global listenerKeyboard, job
+
+        keyBind = "{0}".format(key).replace("'", "").replace("Key.", "")
+
+        btnSilentShotWeaponSwapKeyText.set(keyBind)
+
+        root.update_idletasks()
+        root.update()
+
+        listenerKeyboard.stop()
+
+    btnSilentShotWeaponSwapKeyText.set(silentShotWeaponSwapKey)
+    entrySilentShotWeaponSwapKey = ttb.Button(master=frameSilentShot, style="success-outline",
+                                              textvariable=btnSilentShotWeaponSwapKeyText, command=getWeaponSwapKey)
+    entrySilentShotWeaponSwapKey.pack(fill=X, expand=True, pady=5, padx=5, anchor=W)
 
     labelSilentShotLethalKey = ttb.Label(master=frameSilentShot, text="Time Before Lethal (milliseconds)")
     labelSilentShotLethalKey.pack(fill=X, expand=True, pady=5, padx=5)
@@ -98,23 +155,95 @@ def runMainWindow(root):
     labelSlideCancelActivator = ttb.Label(master=frameSlideCancel, text="Activator Key, e.g. c")
     labelSlideCancelActivator.pack(fill=X, pady=5, padx=5)
 
-    entrySlideCancelActivatorKey = ttb.Entry(master=frameSlideCancel, style="success")
-    entrySlideCancelActivatorKey.insert(0, slideCancelActivatorKey)
-    entrySlideCancelActivatorKey.pack(fill=X, pady=5, padx=5)
+    btnSlideCancelActivatorKeyText = StringVar()
+
+    def getActivatorKey():
+        global listenerKeyboard
+
+        if listenerKeyboard is not None:
+            listenerKeyboard = None
+
+        listenerKeyboard = keyboard.Listener(on_press=handleActivatorPress)
+        listenerKeyboard.start()
+
+    def handleActivatorPress(key):
+        global listenerKeyboard, job
+
+        keyBind = "{0}".format(key).replace("'", "").replace("Key.", "")
+
+        btnSlideCancelActivatorKeyText.set(keyBind)
+
+        root.update_idletasks()
+        root.update()
+
+        listenerKeyboard.stop()
+
+    btnSlideCancelActivatorKeyText.set(slideCancelActivatorKey)
+    btnSlideCancelActivator = ttb.Button(master=frameSlideCancel, style="success-outline",
+                                         textvariable=btnSlideCancelActivatorKeyText, command=getActivatorKey)
+    btnSlideCancelActivator.pack(fill=X, pady=5, padx=5)
 
     labelSlideCancelSlide = ttb.Label(master=frameSlideCancel, text="Slide Key, e.g. c")
     labelSlideCancelSlide.pack(fill=X, pady=5, padx=5)
 
-    entrySlideCancelSlideKey = ttb.Entry(master=frameSlideCancel, style="success")
-    entrySlideCancelSlideKey.insert(0, slideCancelSlideKey)
-    entrySlideCancelSlideKey.pack(fill=X, pady=5, padx=5)
+    btnSlideCancelSlideKeyText = StringVar()
+
+    def getSlideKey():
+        global listenerKeyboard
+
+        if listenerKeyboard is not None:
+            listenerKeyboard = None
+
+        listenerKeyboard = keyboard.Listener(on_press=handleSidePress)
+        listenerKeyboard.start()
+
+    def handleSidePress(key):
+        global listenerKeyboard, job
+
+        keyBind = "{0}".format(key).replace("'", "").replace("Key.", "")
+
+        btnSlideCancelSlideKeyText.set(keyBind)
+
+        root.update_idletasks()
+        root.update()
+
+        listenerKeyboard.stop()
+
+    btnSlideCancelSlideKeyText.set(slideCancelSlideKey)
+    btnSlideCancelSlide = ttb.Button(master=frameSlideCancel, style="success-outline",
+                                     textvariable=btnSlideCancelSlideKeyText, command=getSlideKey)
+    btnSlideCancelSlide.pack(fill=X, pady=5, padx=5)
 
     labelSlideCancelCancel = ttb.Label(master=frameSlideCancel, text="Cancel Key, e.g. space")
     labelSlideCancelCancel.pack(fill=X, pady=5, padx=5)
 
-    entrySlideCancelCancelKey = ttb.Entry(master=frameSlideCancel, style="success")
-    entrySlideCancelCancelKey.insert(0, slideCancelCancelKey)
-    entrySlideCancelCancelKey.pack(fill=X, pady=5, padx=5)
+    btnSlideCancelCancelKeyText = StringVar()
+
+    def getCancelKey():
+        global listenerKeyboard
+
+        if listenerKeyboard is not None:
+            listenerKeyboard = None
+
+        listenerKeyboard = keyboard.Listener(on_press=handleCancelPress)
+        listenerKeyboard.start()
+
+    def handleCancelPress(key):
+        global listenerKeyboard, job
+
+        keyBind = "{0}".format(key).replace("'", "").replace("Key.", "")
+
+        btnSlideCancelCancelKeyText.set(keyBind)
+
+        root.update_idletasks()
+        root.update()
+
+        listenerKeyboard.stop()
+
+    btnSlideCancelCancelKeyText.set(slideCancelCancelKey)
+    btnSlideCancelCancel = ttb.Button(master=frameSlideCancel, style="success-outline",
+                                      textvariable=btnSlideCancelCancelKeyText, command=getCancelKey)
+    btnSlideCancelCancel.pack(fill=X, pady=5, padx=5)
 
     frameSlideCancel.pack(expand=True, fill=BOTH, pady=5, padx=5)
 
@@ -129,21 +258,21 @@ def runMainWindow(root):
     if targetGame == "Modern Warfare":
         targetGameCombobox.current(0)
 
-        entrySlideCancelActivatorKey.configure(state="success")
-        entrySlideCancelSlideKey.configure(state="success")
-        entrySlideCancelCancelKey.configure(state="success")
+        btnSlideCancelActivator.configure(state="success")
+        btnSlideCancelSlide.configure(state="success")
+        btnSlideCancelCancel.configure(state="success")
     elif targetGame == "HQ":
         targetGameCombobox.current(1)
 
-        entrySlideCancelActivatorKey.configure(state="disabled")
-        entrySlideCancelSlideKey.configure(state="disabled")
-        entrySlideCancelCancelKey.configure(state="disabled")
+        btnSlideCancelActivator.configure(state="disabled")
+        btnSlideCancelSlide.configure(state="disabled")
+        btnSlideCancelCancel.configure(state="disabled")
     else:
         targetGameCombobox.current(0)
 
-        entrySlideCancelActivatorKey.configure(state="success")
-        entrySlideCancelSlideKey.configure(state="success")
-        entrySlideCancelCancelKey.configure(state="success")
+        btnSlideCancelActivator.configure(state="success")
+        btnSlideCancelSlide.configure(state="success")
+        btnSlideCancelCancel.configure(state="success")
 
     targetGameCombobox.pack(fill=X, pady=5, padx=5)
 
@@ -182,37 +311,37 @@ def runMainWindow(root):
         if targetGameCombobox.get() == "Modern Warfare":
             settingsConfig["settings"]["targetGame"] = "Modern Warfare"
 
-            entrySlideCancelActivatorKey.configure(state="success")
-            entrySlideCancelSlideKey.configure(state="success")
-            entrySlideCancelCancelKey.configure(state="success")
+            btnSlideCancelActivator.configure(state="success")
+            btnSlideCancelSlide.configure(state="success")
+            btnSlideCancelCancel.configure(state="success")
         elif targetGameCombobox.get() == "Modern Warfare 2":
             settingsConfig["settings"]["targetGame"] = "HQ"
 
-            entrySlideCancelActivatorKey.configure(state="disabled")
-            entrySlideCancelSlideKey.configure(state="disabled")
-            entrySlideCancelCancelKey.configure(state="disabled")
+            btnSlideCancelActivator.configure(state="disabled")
+            btnSlideCancelSlide.configure(state="disabled")
+            btnSlideCancelCancel.configure(state="disabled")
         else:
             settingsConfig["settings"]["targetGame"] = "Modern Warfare"
 
-            entrySlideCancelActivatorKey.configure(state="success")
-            entrySlideCancelSlideKey.configure(state="success")
-            entrySlideCancelCancelKey.configure(state="success")
+            btnSlideCancelActivator.configure(state="success")
+            btnSlideCancelSlide.configure(state="success")
+            btnSlideCancelCancel.configure(state="success")
 
         settingsConfig["settings"]["theme"] = themeCombobox.get()
 
         root.style.theme_use(themeCombobox.get())
 
         silentShotConfig["config"]["enabled"] = silentShotConfig["config"]["enabled"]
-        silentShotConfig["config"]['lethalKey'] = entrySilentShotLethalKey.get()
-        silentShotConfig["config"]['weaponSwapKey'] = entrySilentShotWeaponSwap.get()
+        silentShotConfig["config"]['lethalKey'] = btnSilentShotLethalKeyText.get()
+        silentShotConfig["config"]['weaponSwapKey'] = btnSilentShotWeaponSwapKeyText.get()
         silentShotConfig["config"]['timeBefore'] = entryTimeBeforeLethal.get()
         silentShotConfig["config"]['timeAfter'] = entryTimeAfterLethal.get()
         silentShotConfig["config"]['exitScope'] = "%d" % checkboxValue.get()
 
         slideCancelConfig["config"]["enabled"] = slideCancelConfig["config"]["enabled"]
-        slideCancelConfig["config"]['activatorKey'] = entrySlideCancelActivatorKey.get()
-        slideCancelConfig["config"]['slideKey'] = entrySlideCancelSlideKey.get()
-        slideCancelConfig["config"]['cancelKey'] = entrySlideCancelCancelKey.get()
+        slideCancelConfig["config"]['activatorKey'] = btnSlideCancelActivatorKeyText.get()
+        slideCancelConfig["config"]['slideKey'] = btnSlideCancelSlideKeyText.get()
+        slideCancelConfig["config"]['cancelKey'] = btnSlideCancelCancelKeyText.get()
 
         with open('data/settings.ini', 'w') as configfile:
             settingsConfig.write(configfile)

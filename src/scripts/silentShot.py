@@ -8,6 +8,14 @@ import pydirectinput
 from pynput import mouse
 from pynput.mouse import Button
 
+settings = configparser.ConfigParser()
+settings.read("data/settings.ini")
+
+targetTitle = settings["settings"]["targetGame"]
+
+config = configparser.ConfigParser()
+config.read("data/silentShot.ini")
+
 
 def GetForegroundWindowTitle() -> Optional[str]:
     hWnd = windll.user32.GetForegroundWindow()
@@ -22,7 +30,7 @@ def GetForegroundWindowTitle() -> Optional[str]:
 
 
 def performSilentShot(x, y, button, pressed):
-    global job
+    global job, settings, targetTitle, config
 
     settings = configparser.ConfigParser()
     settings.read("data/settings.ini")
@@ -32,7 +40,6 @@ def performSilentShot(x, y, button, pressed):
     config = configparser.ConfigParser()
     config.read("data/silentShot.ini")
 
-    silentShotEnabled = config["config"]["enabled"] == "1"
     silentShotTimeBefore = config["config"]["timeBefore"]
     silentShotTimeAfter = config["config"]["timeAfter"]
     silentShotLethalKey = config["config"]["lethalKey"]
@@ -40,7 +47,7 @@ def performSilentShot(x, y, button, pressed):
     exitScope = config["config"]["exitScope"] == "1"
 
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
-                                                                                                    "") and pressed and silentShotEnabled:
+                                                                                                    "") and pressed:
         pydirectinput.PAUSE = 0
 
         pydirectinput.mouseDown(button=pydirectinput.LEFT)
@@ -65,12 +72,19 @@ def performSilentShot(x, y, button, pressed):
 
 
 def handleClick(x, y, button, pressed):
-    global job
+    global job, config
+
+    config = configparser.ConfigParser()
+    config.read("data/slideCancel.ini")
+
+    silentShot = config["config"]["enabled"] == "1"
 
     if button == Button.left:
-        if job is None or not job.is_alive():
+        if job is None or not job.is_alive() and silentShot is True:
             job = threading.Thread(target=performSilentShot, args=(x, y, button, pressed))
             job.start()
+        else:
+            job = None
 
 
 job = None
