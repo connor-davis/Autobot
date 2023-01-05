@@ -25,13 +25,8 @@ def GetForegroundWindowTitle() -> Optional[str]:
 targetTitle = "Modern Warfare"
 
 
-def performSlideCancel():
-    global job, configuration
-
-    configuration = configFile.getConfiguration()
-
-    slideCancelSlideKey = configuration.get("slidecancel", "slideKey")
-    slideCancelCancelKey = configuration.get("slidecancel", "cancelKey")
+def performSlideCancel(slideCancelSlideKey, slideCancelCancelKey):
+    global job
 
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
                                                                                                     ""):
@@ -58,10 +53,12 @@ def handlePress(key):
 
     slideCancelEnabled = configuration.get("slidecancel", "enabled") == "1"
     slideCancelActivatorKey = configuration.get("slidecancel", "activatorKey")
+    slideCancelSlideKey = configuration.get("slidecancel", "slideKey")
+    slideCancelCancelKey = configuration.get("slidecancel", "cancelKey")
 
-    if "{0}".format(key).replace("'", "") == slideCancelActivatorKey.lower() and slideCancelEnabled is True:
+    if "{0}".format(key).replace("'", "") == slideCancelActivatorKey.lower() and slideCancelEnabled:
         if job is None or not job.is_alive():
-            job = threading.Thread(target=performSlideCancel)
+            job = threading.Thread(target=performSlideCancel, args=(slideCancelSlideKey, slideCancelCancelKey))
             job.start()
 
 

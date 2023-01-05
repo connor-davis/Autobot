@@ -14,20 +14,20 @@ def handlePress(key):
             configuration.set("silentshot", "enabled", "0")
 
             beep(200, 100)
-            beep(200, 100)
         else:
             configuration.set("silentshot", "enabled", "1")
             
+            beep(200, 100)
             beep(200, 100)
     if key == Key.f3:
         if configuration.getboolean("slidecancel", "enabled"):
             configuration.set("slidecancel", "enabled", "0")
 
             beep(200, 100)
-            beep(200, 100)
         else:
             configuration.set("slidecancel", "enabled", "1")
 
+            beep(200, 100)
             beep(200, 100)
 
     with open('data/configuration.ini', 'w') as configfile:

@@ -10,9 +10,6 @@ from pynput.mouse import Button
 
 import src.utils.configFile as configFile
 
-configuration = configFile.getConfiguration()
-targetTitle = configuration.get("settings", "targetGame")
-
 def GetForegroundWindowTitle() -> Optional[str]:
     hWnd = windll.user32.GetForegroundWindow()
     length = windll.user32.GetWindowTextLengthW(hWnd)
@@ -25,18 +22,8 @@ def GetForegroundWindowTitle() -> Optional[str]:
         return None
 
 
-def performSilentShot(x, y, button, pressed):
-    global job, targetTitle, configuration
-
-    configuration = configFile.getConfiguration()
-
-    targetTitle = configuration.get("settings", "targetGame")
-
-    silentShotTimeBefore = configuration.getint("silentshot", "timeBefore")
-    silentShotTimeAfter = configuration.getint("silentshot", "timeAfter")
-    silentShotLethalKey = configuration.get("silentshot", "lethalKey")
-    silentShotWeaponSwapKey = configuration.get("silentshot", "weaponSwapKey")
-    exitScope = configuration.getboolean("silentshot", "enabled")
+def performSilentShot(x, y, button, pressed, targetTitle, silentShotTimeBefore, silentShotTimeAfter, silentShotLethalKey, silentShotWeaponSwapKey, exitScope):
+    global job
 
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
                                                                                                     "") and pressed:
@@ -63,15 +50,21 @@ def performSilentShot(x, y, button, pressed):
 
 
 def handleClick(x, y, button, pressed):
-    global job, configuration
+    global job
 
     configuration = configFile.getConfiguration()
 
+    targetTitle = configuration.get("settings", "targetGame")
     silentShot = configuration.getboolean("silentshot", "enabled")
+    silentShotTimeBefore = configuration.getint("silentshot", "timeBefore")
+    silentShotTimeAfter = configuration.getint("silentshot", "timeAfter")
+    silentShotLethalKey = configuration.get("silentshot", "lethalKey")
+    silentShotWeaponSwapKey = configuration.get("silentshot", "weaponSwapKey")
+    exitScope = configuration.getboolean("silentshot", "exitScope")
 
-    if button == Button.left and silentShot is True:
+    if button == Button.left and silentShot:
         if job is None or not job.is_alive():
-            job = threading.Thread(target=performSilentShot, args=(x, y, button, pressed))
+            job = threading.Thread(target=performSilentShot, args=(x, y, button, pressed, targetTitle, silentShotTimeBefore, silentShotTimeAfter, silentShotLethalKey, silentShotWeaponSwapKey, exitScope))
             job.start()
 
 
