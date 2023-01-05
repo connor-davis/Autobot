@@ -4,7 +4,7 @@ from os import path
 import ttkbootstrap as ttb
 
 import src.gui.window as window
-import updater
+import src.utils.updateChecker as updater
 
 settings = configparser.ConfigParser()
 settings.read("data/settings.ini")
@@ -19,7 +19,7 @@ if __name__ == '__main__':
 
     print("Running updater.")
 
-    updater.runUpdater(root)
+    updater.runUpdateChecker(root)
 
     print("Running window.")
 

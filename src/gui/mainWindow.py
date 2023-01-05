@@ -1,8 +1,6 @@
-import threading
 from tkinter import IntVar, StringVar
 
 import ttkbootstrap as ttb
-from pynput.keyboard import KeyCode
 from ttkbootstrap.constants import *
 
 from src.scripts.toggler import *

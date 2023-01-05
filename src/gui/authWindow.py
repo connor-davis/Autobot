@@ -1,10 +1,10 @@
+import configparser
 import getpass
 import hashlib
 import os
 import sys
 import uuid
 
-import getmac as gma
 import requests
 import ttkbootstrap as ttb
 from ttkbootstrap.constants import *
@@ -13,8 +13,10 @@ from ttkbootstrap.dialogs import MessageDialog
 userHWID = hashlib.sha256(
     (os.name + getpass.getuser() + str(hex(uuid.getnode()))).encode()).hexdigest()
 
-
 def runAuthWindow(root, callback):
+    settings = configparser.ConfigParser()
+    settings.read("data/settings.ini")
+
     authFrame = ttb.Frame(master=root)
 
     labelHeading = ttb.Label(master=authFrame, text="Autobot Auth", font=("Impact", 24))
@@ -37,6 +39,15 @@ def runAuthWindow(root, callback):
 
         authData = authResponse.json()
 
+        settings = configparser.ConfigParser()
+        settings.read("data/settings.ini")
+
+        settings["settings"]["email"] = userEmail
+        settings["settings"]["password"] = userPassword
+
+        with open('data/settings.ini', 'w') as configfile:
+            settings.write(configfile)
+
         if "error" not in authData:
             userId = authData["user"]["id"]
 
@@ -46,7 +57,8 @@ def runAuthWindow(root, callback):
             accountResponseData = accountResponse.json()
 
             if "hwid" in accountResponseData:
-                if accountResponseData["hwid"] == "" or accountResponseData["hwid"] is None or accountResponseData["hwid"] == userHWID:
+                if accountResponseData["hwid"] == "" or accountResponseData["hwid"] is None or accountResponseData[
+                    "hwid"] == userHWID:
                     updateResponse = requests.put(url="%s%s%s" % (URL, "/api/users/", userId),
                                                   data={"hwid": "%s" % userHWID},
                                                   headers=HEADERS)
@@ -86,11 +98,13 @@ def runAuthWindow(root, callback):
     emailLabel = ttb.Label(master=authFrame, text="Email")
     emailLabel.pack(pady=5, padx=5, fill=X, expand=True)
     emailEntry = ttb.Entry(master=authFrame, bootstyle="success")
+    emailEntry.insert(0, settings["settings"]["email"])
     emailEntry.pack(pady=5, padx=5, fill=X, expand=True)
 
     passwordLabel = ttb.Label(master=authFrame, text="Password")
     passwordLabel.pack(pady=5, padx=5, fill=X, expand=True)
     passwordEntry = ttb.Entry(master=authFrame, bootstyle="success", show="*")
+    passwordEntry.insert(0, settings["settings"]["password"])
     passwordEntry.pack(pady=5, padx=5, fill=X, expand=True)
 
     continueButton = ttb.Button(master=authFrame, text="Continue", bootstyle="success", command=setUserKey)

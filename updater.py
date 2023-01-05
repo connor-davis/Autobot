@@ -1,33 +1,45 @@
 import configparser
+import os
 import shutil
-from os import mkdir, path, getenv
-from tkinter import IntVar
+import sys
+import time
+from os import mkdir, path
 from zipfile import ZipFile
 
 import requests
 import ttkbootstrap as ttb
-from ttkbootstrap.constants import *
 from PIL import Image, ImageTk
 from dotenv import load_dotenv
+from ttkbootstrap.constants import *
 
 load_dotenv()
 
-settings = configparser.ConfigParser()
-settings.read("data/settings.ini")
+if __name__ == '__main__':
+    root = ttb.Window(themename="darkly")
+    root.title("Autobot")
+    iconFile = path.join("src", "assets", "logo.ico")
+    root.iconbitmap(iconFile)
 
+    root.overrideredirect(True)
 
-def runUpdater(root):
-    updaterFrame = ttb.Frame(master=root)
+    if not path.exists("downloads/"):
+        mkdir("downloads/")
 
     image = Image.open("src/assets/logo.png")
     img = image.resize((96, 96))
     file = ImageTk.PhotoImage(img)
 
+    updaterFrame = ttb.Frame(master=root)
+
     updaterLabel = ttb.Label(master=updaterFrame, image=file)
     updaterLabel.pack(pady=(0, 30), padx=50)
 
-    updaterLabel = ttb.Label(master=updaterFrame, text="Checking for updates", font=("Impact", 13))
+    updaterLabel = ttb.Label(master=updaterFrame, text="Downloading Autobot", font=("Impact", 13))
     updaterLabel.pack()
+
+    updaterProgressbar = ttb.Progressbar(master=updaterFrame, bootstyle="success", maximum=100,
+                                         value=0)
+    updaterProgressbar.pack(fill=X, expand=True)
 
     updaterFrame.pack(pady=30, padx=30)
 
@@ -45,14 +57,6 @@ def runUpdater(root):
     root.update_idletasks()
     root.update()
 
-    currentVersionTag = settings["settings"]["version"]
-    currentVersionTagSplit = currentVersionTag.split(".")
-    currentVersion = currentVersionTagSplit[0]
-    currentVersionMajor = currentVersionTagSplit[1]
-    currentVersionMinor = currentVersionTagSplit[2]
-
-    print("Fetching latest release")
-
     URL = "https://api.github.com/repos/connor-davis/Autobot/releases/latest"
 
     r = requests.get(url=URL)
@@ -61,113 +65,87 @@ def runUpdater(root):
     downloadUrl = data["assets"][0]["browser_download_url"]
     fileName = data["assets"][0]["name"]
     versionTag = data["tag_name"]
-    versionTagSplit = versionTag.split(".")
-    version = versionTagSplit[0]
-    versionMajor = versionTagSplit[1]
-    versionMinor = versionTagSplit[2]
 
-    print("Current Version: %s, Major: %s, Minor: %s" % (currentVersion, currentVersionMajor, currentVersionMinor))
-    print("Latest Version: %s, Major: %s, Minor: %s" % (version, versionMajor, versionMinor))
+    with open("downloads/%s" % fileName, "wb") as f:
+        print("Downloading %s" % fileName)
 
-    if version > currentVersion or versionMajor > currentVersionMajor or versionMinor > currentVersionMinor:
-        if not path.exists("downloads/"):
-            mkdir("downloads/")
+        response = requests.get(downloadUrl, stream=True)
+        totalLength = response.headers.get('content-length')
 
-        updaterLabel.destroy()
+        if totalLength is None:
+            f.write(response.content)
+        else:
+            dl = 0
+            totalLength = int(totalLength)
 
-        updaterLabel = ttb.Label(master=updaterFrame, text="Downloading update", font=("Impact", 13))
-        updaterLabel.pack(pady=(0, 10))
+            for data in response.iter_content(chunk_size=4096):
+                dl += len(data)
+                f.write(data)
+                done = int(100 * dl / totalLength)
 
-        updaterProgressbar = ttb.Progressbar(master=updaterFrame, bootstyle="success", maximum=100,
-                                             value=0)
-        updaterProgressbar.pack(fill=X, expand=True)
+                updaterProgressbar.destroy()
+                updaterProgressbar = ttb.Progressbar(master=updaterFrame, bootstyle="success",
+                                                     maximum=100, value=done, mode="determinate")
+                updaterProgressbar.pack(fill=X, expand=True)
 
-        updaterFrame.pack()
+                updaterFrame.pack()
 
-        root.update_idletasks()
-        root.update()
+                root.update_idletasks()
+                root.update()
 
-        print("New version found. Downloading.")
+    updaterLabel.destroy()
 
-        root.update_idletasks()
-        root.update()
+    updaterLabel = ttb.Label(master=updaterFrame, text="Extracting update", font=("Impact", 13))
+    updaterLabel.pack()
 
-        with open("downloads/%s" % fileName, "wb") as f:
-            print("Downloading %s" % fileName)
+    updaterProgressbar.destroy()
 
-            response = requests.get(downloadUrl, stream=True)
-            totalLength = response.headers.get('content-length')
+    updaterFrame.pack()
 
-            if totalLength is None:
-                f.write(response.content)
-            else:
-                dl = 0
-                totalLength = int(totalLength)
+    root.update_idletasks()
+    root.update()
 
-                for data in response.iter_content(chunk_size=4096):
-                    dl += len(data)
-                    f.write(data)
-                    done = int(100 * dl / totalLength)
+    print("Extracting new version.")
 
-                    updaterProgressbar.destroy()
-                    updaterProgressbar = ttb.Progressbar(master=updaterFrame, bootstyle="success",
-                                                         maximum=100, value=done, mode="determinate")
-                    updaterProgressbar.pack(fill=X, expand=True)
+    with ZipFile("downloads/%s" % fileName, 'r') as zObject:
+        zObject.extractall(path="downloads/")
 
-                    updaterFrame.pack()
+    zObject.close()
 
-                    root.update_idletasks()
-                    root.update()
+    print("Extracted new version.")
 
-        updaterLabel.destroy()
+    print("Copying download src directory contents to local src directory.")
 
-        updaterLabel = ttb.Label(master=updaterFrame, text="Extracting update", font=("Impact", 13))
-        updaterLabel.pack()
+    source_file = r"downloads/Autobot/Autobot.exe"
+    destination_file = r"Autobot.exe"
 
-        updaterProgressbar.destroy()
+    shutil.copy2(source_file, destination_file)
 
-        updaterFrame.pack()
+    print("Update has been completed.")
 
-        root.update_idletasks()
-        root.update()
+    settings = configparser.ConfigParser()
+    settings.read("data/settings.ini")
 
-        print("Extracting new version.")
+    settings["settings"]["version"] = versionTag
 
-        with ZipFile("downloads/%s" % fileName, 'r') as zObject:
-            zObject.extractall(path="downloads/")
+    with open('data/settings.ini', 'w') as configfile:
+        settings.write(configfile)
 
-        zObject.close()
+    updaterLabel = ttb.Label(master=updaterFrame, text="Update finished.", font=("Impact", 13))
+    updaterLabel.pack()
 
-        print("Extracted new version.")
+    updaterFrame.pack()
 
-        if path.exists("src/"):
-            shutil.rmtree("src/")
+    root.update_idletasks()
+    root.update()
 
-        print("Copying download src directory contents to local src directory.")
-
-        source_folder = r"downloads/Autobot/src/"
-        destination_folder = r"src/"
-
-        shutil.copytree(source_folder, destination_folder)
-
-        print("Update has been completed.")
-
-        settings.read("data/settings.ini")
-
-        settings["settings"]["version"] = versionTag
-
-        with open('data/settings.ini', 'w') as configfile:
-            settings.write(configfile)
-
-        updaterLabel = ttb.Label(master=updaterFrame, text="Update finished.", font=("Impact", 13))
-        updaterLabel.pack()
-
-        updaterFrame.pack()
-
-        root.update_idletasks()
-        root.update()
+    time.sleep(2)
 
     updaterFrame.destroy()
 
     root.update_idletasks()
     root.update()
+
+    os.startfile("%s\\Autobot.exe" % os.curdir)
+
+    sys.exit(0)
