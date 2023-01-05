@@ -5,27 +5,22 @@ from ttkbootstrap.constants import *
 
 from src.scripts.toggler import *
 
-settingsConfig = configparser.ConfigParser()
-settingsConfig.read("data/settings.ini")
+import src.utils.configFile as configFile
 
-silentShotConfig = configparser.ConfigParser()
-silentShotConfig.read("data/silentShot.ini")
+configuration = configFile.getConfiguration()
 
-slideCancelConfig = configparser.ConfigParser()
-slideCancelConfig.read("data/slideCancel.ini")
+targetGame = configuration.get("settings", "targetGame")
+theme = configuration.get("settings", "theme")
 
-targetGame = settingsConfig["settings"]["targetGame"]
-theme = settingsConfig["settings"]["theme"]
+silentShotLethalKey = configuration.get("silentshot", "lethalKey")
+silentShotWeaponSwapKey = configuration.get("silentshot", "weaponSwapKey")
+silentShotTimeBefore = configuration.getint("silentshot", "timeBefore")
+silentShotTimeAfter = configuration.getint("silentshot", "timeAfter")
+exitScopeAfterSilentShot = configuration.getboolean("silentshot", "exitScope")
 
-silentShotLethalKey = silentShotConfig["config"]["lethalKey"]
-silentShotWeaponSwapKey = silentShotConfig["config"]["weaponSwapKey"]
-silentShotTimeBefore = silentShotConfig["config"]["timeBefore"]
-silentShotTimeAfter = silentShotConfig["config"]["timeAfter"]
-exitScopeAfterSilentShot = silentShotConfig["config"]["exitScope"] == "1"
-
-slideCancelActivatorKey = slideCancelConfig["config"]["activatorKey"]
-slideCancelSlideKey = slideCancelConfig["config"]["slideKey"]
-slideCancelCancelKey = slideCancelConfig["config"]["cancelKey"]
+slideCancelActivatorKey = configuration.get("slidecancel", "activatorKey")
+slideCancelSlideKey = configuration.get("slidecancel", "slideKey")
+slideCancelCancelKey = configuration.get("slidecancel", "cancelKey")
 
 
 def toggleExitScope():
@@ -302,51 +297,47 @@ def runMainWindow(root):
     notebookConfiguration.pack(fill=BOTH, expand=True, pady=5, padx=5)
 
     def applyChanges():
-        settingsConfig.read("data/settings.ini")
-        silentShotConfig.read("data/silentShot.ini")
-        slideCancelConfig.read("data/slideCancel.ini")
+        global configuration
+
+        configuration = configFile.getConfiguration()
 
         if targetGameCombobox.get() == "Modern Warfare":
-            settingsConfig["settings"]["targetGame"] = "Modern Warfare"
+            configuration.set("settings", "targetGame", "Modern Warfare")
 
             btnSlideCancelActivator.configure(state="success")
             btnSlideCancelSlide.configure(state="success")
             btnSlideCancelCancel.configure(state="success")
         elif targetGameCombobox.get() == "Modern Warfare 2":
-            settingsConfig["settings"]["targetGame"] = "HQ"
+            configuration.set("settings", "targetGame", "HQ")
 
             btnSlideCancelActivator.configure(state="disabled")
             btnSlideCancelSlide.configure(state="disabled")
             btnSlideCancelCancel.configure(state="disabled")
         else:
-            settingsConfig["settings"]["targetGame"] = "Modern Warfare"
+            configuration.set("settings", "targetGame", "Modern Warfare")
 
             btnSlideCancelActivator.configure(state="success")
             btnSlideCancelSlide.configure(state="success")
             btnSlideCancelCancel.configure(state="success")
 
-        settingsConfig["settings"]["theme"] = themeCombobox.get()
+        configuration.set("settings", "theme", themeCombobox.get())
 
         root.style.theme_use(themeCombobox.get())
 
-        silentShotConfig["config"]["enabled"] = silentShotConfig["config"]["enabled"]
-        silentShotConfig["config"]['lethalKey'] = btnSilentShotLethalKeyText.get()
-        silentShotConfig["config"]['weaponSwapKey'] = btnSilentShotWeaponSwapKeyText.get()
-        silentShotConfig["config"]['timeBefore'] = entryTimeBeforeLethal.get()
-        silentShotConfig["config"]['timeAfter'] = entryTimeAfterLethal.get()
-        silentShotConfig["config"]['exitScope'] = "%d" % checkboxValue.get()
+        configuration.set("silentshot", "lethalKey", btnSilentShotLethalKeyText.get())
+        configuration.set("silentshot", "weaponSwapKey", btnSilentShotWeaponSwapKeyText.get())
+        configuration.set("silentshot", "timeBefore", entryTimeBeforeLethal.get())
+        configuration.set("silentshot", "timeAfter", entryTimeAfterLethal.get())
+        configuration.set("silentshot", "exitScope", "%d" % checkboxValue.get())
 
-        slideCancelConfig["config"]["enabled"] = slideCancelConfig["config"]["enabled"]
-        slideCancelConfig["config"]['activatorKey'] = btnSlideCancelActivatorKeyText.get()
-        slideCancelConfig["config"]['slideKey'] = btnSlideCancelSlideKeyText.get()
-        slideCancelConfig["config"]['cancelKey'] = btnSlideCancelCancelKeyText.get()
+        configuration.set("slidecancel", "activatorKey", btnSlideCancelActivatorKeyText.get())
+        configuration.set("slidecancel", "slideKey", btnSlideCancelSlideKeyText.get())
+        configuration.set("slidecancel", "cancelKey", btnSlideCancelCancelKeyText.get())
 
-        with open('data/settings.ini', 'w') as configfile:
-            settingsConfig.write(configfile)
-        with open('data/silentShot.ini', 'w') as configfile:
-            silentShotConfig.write(configfile)
-        with open('data/slideCancel.ini', 'w') as configfile:
-            slideCancelConfig.write(configfile)
+        with open('data/configuration.ini', 'w') as configfile:
+            configuration.write(configfile)
+            configfile.flush()
+            configfile.close()
 
     applyChangesButton = ttb.Button(master=root, text="Apply Changes", command=applyChanges, style="success")
     applyChangesButton.pack(fill=X, expand=True, pady=5, padx=5)

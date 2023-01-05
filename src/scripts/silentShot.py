@@ -8,14 +8,10 @@ import pydirectinput
 from pynput import mouse
 from pynput.mouse import Button
 
-settings = configparser.ConfigParser()
-settings.read("data/settings.ini")
+import src.utils.configFile as configFile
 
-targetTitle = settings["settings"]["targetGame"]
-
-config = configparser.ConfigParser()
-config.read("data/silentShot.ini")
-
+configuration = configFile.getConfiguration()
+targetTitle = configuration.get("settings", "targetGame")
 
 def GetForegroundWindowTitle() -> Optional[str]:
     hWnd = windll.user32.GetForegroundWindow()
@@ -30,26 +26,21 @@ def GetForegroundWindowTitle() -> Optional[str]:
 
 
 def performSilentShot(x, y, button, pressed):
-    global job, settings, targetTitle, config
+    global job, targetTitle, configuration
 
-    settings = configparser.ConfigParser()
-    settings.read("data/settings.ini")
+    configuration = configFile.getConfiguration()
 
-    targetTitle = settings["settings"]["targetGame"]
+    targetTitle = configuration.get("settings", "targetGame")
 
-    config = configparser.ConfigParser()
-    config.read("data/silentShot.ini")
-
-    silentShotTimeBefore = config["config"]["timeBefore"]
-    silentShotTimeAfter = config["config"]["timeAfter"]
-    silentShotLethalKey = config["config"]["lethalKey"]
-    silentShotWeaponSwapKey = config["config"]["weaponSwapKey"]
-    exitScope = config["config"]["exitScope"] == "1"
+    silentShotTimeBefore = configuration.getint("silentshot", "timeBefore")
+    silentShotTimeAfter = configuration.getint("silentshot", "timeAfter")
+    silentShotLethalKey = configuration.get("silentshot", "lethalKey")
+    silentShotWeaponSwapKey = configuration.get("silentshot", "weaponSwapKey")
+    exitScope = configuration.getboolean("silentshot", "enabled")
 
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
                                                                                                     "") and pressed:
         pydirectinput.PAUSE = 0
-
         pydirectinput.mouseDown(button=pydirectinput.LEFT)
 
         if targetTitle == "Modern Warfare":
@@ -72,12 +63,11 @@ def performSilentShot(x, y, button, pressed):
 
 
 def handleClick(x, y, button, pressed):
-    global job, config
+    global job, configuration
 
-    config = configparser.ConfigParser()
-    config.read("data/slideCancel.ini")
+    configuration = configFile.getConfiguration()
 
-    silentShot = config["config"]["enabled"] == "1"
+    silentShot = configuration.getboolean("silentshot", "enabled")
 
     if button == Button.left and silentShot is True:
         if job is None or not job.is_alive():

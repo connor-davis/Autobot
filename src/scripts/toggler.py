@@ -2,44 +2,38 @@ import configparser
 from pynput import keyboard
 from pynput.keyboard import Key
 from src.utils.beeper import *
-import ttkbootstrap as ttk
-from ttkbootstrap.dialogs.dialogs import Messagebox
+import src.utils.configFile as configFile
 
 listener = None
 
 def handlePress(key):
-    silentShotConfig = configparser.ConfigParser()
-    silentShotConfig.read("data/silentShot.ini")
-
-    slideCancelConfig = configparser.ConfigParser()
-    slideCancelConfig.read("data/slideCancel.ini")
+    configuration = configFile.getConfiguration()
 
     if key == Key.f2:
-        if silentShotConfig["config"]["enabled"] == "0":
-            silentShotConfig["config"]["enabled"] = "1"
+        if configuration.getboolean("silentshot", "enabled"):
+            configuration.set("silentshot", "enabled", "0")
 
             beep(200, 100)
             beep(200, 100)
         else:
-            silentShotConfig["config"]["enabled"] = "0"
+            configuration.set("silentshot", "enabled", "1")
             
             beep(200, 100)
     if key == Key.f3:
-        if slideCancelConfig["config"]["enabled"] == "0":
-            slideCancelConfig["config"]["enabled"] = "1"
+        if configuration.getboolean("slidecancel", "enabled"):
+            configuration.set("slidecancel", "enabled", "0")
 
             beep(200, 100)
             beep(200, 100)
         else:
-            slideCancelConfig["config"]["enabled"] = "0"
+            configuration.set("slidecancel", "enabled", "1")
 
             beep(200, 100)
 
     with open('data/silentShot.ini', 'w') as configfile:
-        silentShotConfig.write(configfile)
-
-    with open('data/slideCancel.ini', 'w') as configfile:
-        slideCancelConfig.write(configfile)
+        configuration.write(configfile)
+        configfile.flush()
+        configfile.close()
 
 def initializeToggler():
     global listener

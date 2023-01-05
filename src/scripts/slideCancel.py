@@ -6,9 +6,9 @@ from typing import Optional
 
 import pydirectinput
 from pynput import keyboard
+import src.utils.configFile as configFile
 
-config = configparser.ConfigParser()
-config.read("data/slideCancel.ini")
+configuration = configFile.getConfiguration()
 
 def GetForegroundWindowTitle() -> Optional[str]:
     hWnd = windll.user32.GetForegroundWindow()
@@ -26,13 +26,12 @@ targetTitle = "Modern Warfare"
 
 
 def performSlideCancel():
-    global job, config
+    global job, configuration
 
-    config = configparser.ConfigParser()
-    config.read("data/slideCancel.ini")
+    configuration = configFile.getConfiguration()
 
-    slideCancelSlideKey = config["config"]["slideKey"]
-    slideCancelCancelKey = config["config"]["cancelKey"]
+    slideCancelSlideKey = configuration.get("slidecancel", "slideKey")
+    slideCancelCancelKey = configuration.get("slidecancel", "cancelKey")
 
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
                                                                                                     ""):
@@ -53,13 +52,12 @@ def performSlideCancel():
 
 
 def handlePress(key):
-    global job, config
+    global job, configuration
 
-    config = configparser.ConfigParser()
-    config.read("data/slideCancel.ini")
+    configuration = configFile.getConfiguration()
 
-    slideCancelEnabled = config["config"]["enabled"] == "1"
-    slideCancelActivatorKey = config["config"]["activatorKey"]
+    slideCancelEnabled = configuration.get("slidecancel", "enabled") == "1"
+    slideCancelActivatorKey = configuration.get("slidecancel", "activatorKey")
 
     if "{0}".format(key).replace("'", "") == slideCancelActivatorKey.lower() and slideCancelEnabled is True:
         if job is None or not job.is_alive():
