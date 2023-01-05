@@ -29,6 +29,6 @@ def runWindow(root):
     initializeSlideCancel()
     initializeToggler()
 
-    # initializeApp(root)
+    initializeApp(root)
 
-    authWindow.runAuthWindow(root, initializeApp)
+    # authWindow.runAuthWindow(root, initializeApp)
