@@ -5,12 +5,12 @@ import ttkbootstrap as ttb
 
 import src.gui.window as window
 import src.utils.updateChecker as updater
+import src.utils.configFile as configFile
 
-settings = configparser.ConfigParser()
-settings.read("data/settings.ini")
+configuration = configFile.getConfiguration()
 
 if __name__ == '__main__':
-    root = ttb.Window(themename=settings["settings"]["theme"])
+    root = ttb.Window(themename=configuration.get("settings", "theme"))
     root.title("Autobot")
     iconFile = path.join("src", "assets", "logo.ico")
     root.iconbitmap(iconFile)

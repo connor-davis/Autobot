@@ -30,7 +30,7 @@ def handlePress(key):
 
             beep(200, 100)
 
-    with open('data/silentShot.ini', 'w') as configfile:
+    with open('data/configuration.ini', 'w') as configfile:
         configuration.write(configfile)
         configfile.flush()
         configfile.close()

@@ -9,12 +9,11 @@ from PIL import Image, ImageTk
 from dotenv import load_dotenv
 from ttkbootstrap.constants import *
 from ttkbootstrap.dialogs import Messagebox
+import src.utils.configFile as configFile
 
 load_dotenv()
 
-settings = configparser.ConfigParser()
-settings.read("data/settings.ini")
-
+configuration = configFile.getConfiguration()
 
 def runUpdateChecker(root):
     updaterFrame = ttb.Frame(master=root)
@@ -45,7 +44,7 @@ def runUpdateChecker(root):
     root.update_idletasks()
     root.update()
 
-    currentVersionTag = settings["settings"]["version"]
+    currentVersionTag = configuration.get("settings", "version")
     currentVersionTagSplit = currentVersionTag.split(".")
     currentVersion = currentVersionTagSplit[0]
     currentVersionMajor = currentVersionTagSplit[1]
