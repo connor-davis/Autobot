@@ -12,6 +12,10 @@ from PIL import Image, ImageTk
 from dotenv import load_dotenv
 from ttkbootstrap.constants import *
 
+import src.utils.configFile as configFile
+
+configuration = configFile.getConfiguration()
+
 load_dotenv()
 
 if __name__ == '__main__':
@@ -123,13 +127,10 @@ if __name__ == '__main__':
 
     print("Update has been completed.")
 
-    settings = configparser.ConfigParser()
-    settings.read("data/settings.ini")
+    configuration.set("settings", "version", versionTag)
 
-    settings["settings"]["version"] = versionTag
-
-    with open('data/settings.ini', 'w') as configfile:
-        settings.write(configfile)
+    with open('data/configuration.ini', 'w') as configfile:
+        configuration.write(configfile)
 
     updaterLabel = ttb.Label(master=updaterFrame, text="Update finished.", font=("Impact", 13))
     updaterLabel.pack()
