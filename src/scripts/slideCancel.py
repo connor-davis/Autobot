@@ -61,12 +61,10 @@ def handlePress(key):
     slideCancelEnabled = config["config"]["enabled"] == "1"
     slideCancelActivatorKey = config["config"]["activatorKey"]
 
-    if "{0}".format(key).replace("'", "") == slideCancelActivatorKey.lower():
-        if job is None or not job.is_alive() and slideCancelEnabled is True:
+    if "{0}".format(key).replace("'", "") == slideCancelActivatorKey.lower() and slideCancelEnabled is True:
+        if job is None or not job.is_alive():
             job = threading.Thread(target=performSlideCancel)
             job.start()
-        else:
-            job = None
 
 
 job = None

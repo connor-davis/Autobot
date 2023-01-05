@@ -79,12 +79,10 @@ def handleClick(x, y, button, pressed):
 
     silentShot = config["config"]["enabled"] == "1"
 
-    if button == Button.left:
-        if job is None or not job.is_alive() and silentShot is True:
+    if button == Button.left and silentShot is True:
+        if job is None or not job.is_alive():
             job = threading.Thread(target=performSilentShot, args=(x, y, button, pressed))
             job.start()
-        else:
-            job = None
 
 
 job = None
