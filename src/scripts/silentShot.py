@@ -10,6 +10,15 @@ from pynput.mouse import Button
 
 import src.utils.configFile as configFile
 
+configuration = configFile.getConfiguration()
+
+targetTitle = configuration.get("settings", "targetGame")
+silentShotTimeBefore = configuration.getint("silentshot", "timeBefore")
+silentShotTimeAfter = configuration.getint("silentshot", "timeAfter")
+silentShotLethalKey = configuration.get("silentshot", "lethalKey")
+silentShotWeaponSwapKey = configuration.get("silentshot", "weaponSwapKey")
+exitScope = configuration.getboolean("silentshot", "exitScope")
+
 def GetForegroundWindowTitle() -> Optional[str]:
     hWnd = windll.user32.GetForegroundWindow()
     length = windll.user32.GetWindowTextLengthW(hWnd)
@@ -22,7 +31,7 @@ def GetForegroundWindowTitle() -> Optional[str]:
         return None
 
 
-def performSilentShot(x, y, button, pressed, targetTitle, silentShotTimeBefore, silentShotTimeAfter, silentShotLethalKey, silentShotWeaponSwapKey, exitScope):
+def performSilentShot(x, y, button, pressed):
     global job
 
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
@@ -50,32 +59,36 @@ def performSilentShot(x, y, button, pressed, targetTitle, silentShotTimeBefore, 
 
 
 def handleClick(x, y, button, pressed):
-    global job
+    global job, configuration
 
     configuration = configFile.getConfiguration()
 
-    targetTitle = configuration.get("settings", "targetGame")
-    silentShot = configuration.getboolean("silentshot", "enabled")
-    silentShotTimeBefore = configuration.getint("silentshot", "timeBefore")
-    silentShotTimeAfter = configuration.getint("silentshot", "timeAfter")
-    silentShotLethalKey = configuration.get("silentshot", "lethalKey")
-    silentShotWeaponSwapKey = configuration.get("silentshot", "weaponSwapKey")
-    exitScope = configuration.getboolean("silentshot", "exitScope")
-
-    if button == Button.left and silentShot:
+    if button == Button.left and configuration.get("silentshot", "enabled") == "1":
         if job is None or not job.is_alive():
-            job = threading.Thread(target=performSilentShot, args=(x, y, button, pressed, targetTitle, silentShotTimeBefore, silentShotTimeAfter, silentShotLethalKey, silentShotWeaponSwapKey, exitScope))
+            job = threading.Thread(target=performSilentShot, args=(x, y, button, pressed))
             job.start()
 
 
 job = None
 
-listener = mouse.Listener(on_click=handleClick)
+listener = None
 
 
 def initializeSilentShot():
+    global listener
+
+    listener = mouse.Listener(on_click=handleClick)
     listener.start()
+
+    print("Initialized silent shot.")
 
 
 def uninitializeSilentShot():
-    listener.stop()
+    global listener, job
+
+    if listener is not None and job is not None:
+        listener.stop()
+        listener = None
+        job = None
+
+    print("Uninitialized silent shot.")

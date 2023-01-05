@@ -9,6 +9,9 @@ from pynput import keyboard
 import src.utils.configFile as configFile
 
 configuration = configFile.getConfiguration()
+slideCancelActivatorKey = configuration.get("slidecancel", "activatorKey")
+slideCancelSlideKey = configuration.get("slidecancel", "slideKey")
+slideCancelCancelKey = configuration.get("slidecancel", "cancelKey")
 
 def GetForegroundWindowTitle() -> Optional[str]:
     hWnd = windll.user32.GetForegroundWindow()
@@ -25,7 +28,7 @@ def GetForegroundWindowTitle() -> Optional[str]:
 targetTitle = "Modern Warfare"
 
 
-def performSlideCancel(slideCancelSlideKey, slideCancelCancelKey):
+def performSlideCancel():
     global job
 
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
@@ -51,25 +54,29 @@ def handlePress(key):
 
     configuration = configFile.getConfiguration()
 
-    slideCancelEnabled = configuration.get("slidecancel", "enabled") == "1"
-    slideCancelActivatorKey = configuration.get("slidecancel", "activatorKey")
-    slideCancelSlideKey = configuration.get("slidecancel", "slideKey")
-    slideCancelCancelKey = configuration.get("slidecancel", "cancelKey")
-
-    if "{0}".format(key).replace("'", "") == slideCancelActivatorKey.lower() and slideCancelEnabled:
+    if "{0}".format(key).replace("'", "") == slideCancelActivatorKey.lower() and configuration.getboolean("slidecancel", "enabled"):
         if job is None or not job.is_alive():
-            job = threading.Thread(target=performSlideCancel, args=(slideCancelSlideKey, slideCancelCancelKey))
+            job = threading.Thread(target=performSlideCancel)
             job.start()
 
 
 job = None
-
-listener = keyboard.Listener(on_press=handlePress)
-
+listener = None
 
 def initializeSlideCancel():
+    global listener
+
+    listener = keyboard.Listener(on_press=handlePress)
     listener.start()
 
+    print("Initialized slide cancel.")
 
 def uninitializeSlideCancel():
-    listener.stop()
+    global listener, job
+
+    if listener is not None and job is not None:
+        listener.stop()
+        listener = None
+        job = None
+
+    print("Uninitialized slide cancel.")

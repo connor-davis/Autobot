@@ -3,6 +3,8 @@ from tkinter import IntVar, StringVar
 import ttkbootstrap as ttb
 from ttkbootstrap.constants import *
 
+from src.scripts.silentShot import *
+from src.scripts.slideCancel import *
 from src.scripts.toggler import *
 
 import src.utils.configFile as configFile
@@ -94,11 +96,11 @@ def runMainWindow(root):
         if listenerKeyboard is not None:
             listenerKeyboard = None
 
-        listenerKeyboard = keyboard.Listener(on_press=handleActivatorPress)
+        listenerKeyboard = keyboard.Listener(on_press=handleWeaponSwapPress)
         listenerKeyboard.start()
 
-    def handleActivatorPress(key):
-        global listenerKeyboard, job
+    def handleWeaponSwapPress(key):
+        global listenerKeyboard
 
         keyBind = "{0}".format(key).replace("'", "").replace("Key.", "")
 
@@ -108,6 +110,7 @@ def runMainWindow(root):
         root.update()
 
         listenerKeyboard.stop()
+        listenerKeyboard = None
 
     btnSilentShotWeaponSwapKeyText.set(silentShotWeaponSwapKey)
     entrySilentShotWeaponSwapKey = ttb.Button(master=frameSilentShot, style="success-outline",
@@ -338,6 +341,16 @@ def runMainWindow(root):
             configuration.write(configfile)
             configfile.flush()
             configfile.close()
+
+        print("Uninitializing scripts.")
+
+        uninitializeSilentShot()
+        uninitializeSlideCancel()
+
+        print("Initializing scripts.")
+
+        initializeSilentShot()
+        initializeSlideCancel()
 
     applyChangesButton = ttb.Button(master=root, text="Apply Changes", command=applyChanges, style="success")
     applyChangesButton.pack(fill=X, expand=True, pady=5, padx=5)

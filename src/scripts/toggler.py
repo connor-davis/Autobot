@@ -3,6 +3,8 @@ from pynput import keyboard
 from pynput.keyboard import Key
 from src.utils.beeper import *
 import src.utils.configFile as configFile
+from src.scripts.silentShot import *
+from src.scripts.slideCancel import *
 
 listener = None
 
@@ -14,21 +16,29 @@ def handlePress(key):
             configuration.set("silentshot", "enabled", "0")
 
             beep(200, 100)
+
+            uninitializeSilentShot()
         else:
             configuration.set("silentshot", "enabled", "1")
             
             beep(200, 100)
             beep(200, 100)
+
+            initializeSilentShot()
     if key == Key.f3:
         if configuration.getboolean("slidecancel", "enabled"):
             configuration.set("slidecancel", "enabled", "0")
 
             beep(200, 100)
+
+            uninitializeSlideCancel()
         else:
             configuration.set("slidecancel", "enabled", "1")
 
             beep(200, 100)
             beep(200, 100)
+
+            initializeSlideCancel()
 
     with open('data/configuration.ini', 'w') as configfile:
         configuration.write(configfile)

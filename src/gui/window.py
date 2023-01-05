@@ -5,6 +5,8 @@ from src.scripts.toggler import *
 import src.gui.mainWindow as mainWindow
 import src.gui.authWindow as authWindow
 
+import src.utils.configFile as configFile
+
 def initializeApp(root):
     mainWindow.runMainWindow(root)
 
@@ -25,8 +27,18 @@ def initializeApp(root):
 def runWindow(root):
     print("Initializing scripts.")
 
-    initializeSilentShot()
-    initializeSlideCancel()
+    configuration = configFile.getConfiguration()
+
+    if configuration.getboolean("silentshot", "enabled"):
+        initializeSilentShot()
+    else:
+        uninitializeSilentShot()
+
+    if configuration.getboolean("slidecancel", "enabled"):
+        initializeSlideCancel()
+    else:
+        uninitializeSlideCancel()
+
     initializeToggler()
 
     authWindow.runAuthWindow(root, initializeApp)
