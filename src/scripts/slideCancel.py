@@ -29,32 +29,35 @@ targetTitle = "Modern Warfare"
 
 
 def performSlideCancel():
-    global job
+    global job, configuration
 
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
                                                                                                     ""):
-        pydirectinput.PAUSE = 0
-        pydirectinput.keyDown("%s" % slideCancelSlideKey.lower())
-        time.sleep(0.08)
-        pydirectinput.keyUp("%s" % slideCancelSlideKey.lower())
-        time.sleep(0.08)
-        pydirectinput.keyDown("%s" % slideCancelSlideKey.lower())
-        time.sleep(0.08)
-        pydirectinput.keyUp("%s" % slideCancelSlideKey.lower())
-        time.sleep(0.035)
-        pydirectinput.keyDown("%s" % slideCancelCancelKey.lower())
-        time.sleep(0.035)
-        pydirectinput.keyUp("%s" % slideCancelCancelKey.lower())
+        configuration = configFile.getConfiguration()
 
-        job = None
+        if configuration.getboolean("slidecancel", "enabled"):
+            pydirectinput.PAUSE = 0
+            pydirectinput.keyDown("%s" % slideCancelSlideKey.lower())
+            time.sleep(0.08)
+            pydirectinput.keyUp("%s" % slideCancelSlideKey.lower())
+            time.sleep(0.08)
+            pydirectinput.keyDown("%s" % slideCancelSlideKey.lower())
+            time.sleep(0.08)
+            pydirectinput.keyUp("%s" % slideCancelSlideKey.lower())
+            time.sleep(0.035)
+            pydirectinput.keyDown("%s" % slideCancelCancelKey.lower())
+            time.sleep(0.035)
+            pydirectinput.keyUp("%s" % slideCancelCancelKey.lower())
+
+            job = None
 
 
 def handlePress(key):
     global job, configuration
 
-    configuration = configFile.getConfiguration()
 
-    if "{0}".format(key).replace("'", "") == slideCancelActivatorKey.lower() and configuration.getboolean("slidecancel", "enabled"):
+
+    if "{0}".format(key).replace("'", "") == slideCancelActivatorKey.lower():
         if job is None or not job.is_alive():
             job = threading.Thread(target=performSlideCancel)
             job.start()

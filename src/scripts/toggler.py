@@ -1,12 +1,11 @@
-import configparser
-from pynput import keyboard
 from pynput.keyboard import Key
-from src.utils.beeper import *
-import src.utils.configFile as configFile
+
 from src.scripts.silentShot import *
 from src.scripts.slideCancel import *
+from src.utils.beeper import *
 
 listener = None
+
 
 def handlePress(key):
     configuration = configFile.getConfiguration()
@@ -20,7 +19,7 @@ def handlePress(key):
             uninitializeSilentShot()
         else:
             configuration.set("silentshot", "enabled", "1")
-            
+
             beep(200, 100)
             beep(200, 100)
 
@@ -44,6 +43,7 @@ def handlePress(key):
         configuration.write(configfile)
         configfile.flush()
         configfile.close()
+
 
 def initializeToggler():
     global listener

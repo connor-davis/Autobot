@@ -1,4 +1,3 @@
-import configparser
 import threading
 import time
 from ctypes import windll, create_unicode_buffer
@@ -19,6 +18,7 @@ silentShotLethalKey = configuration.get("silentshot", "lethalKey")
 silentShotWeaponSwapKey = configuration.get("silentshot", "weaponSwapKey")
 exitScope = configuration.getboolean("silentshot", "exitScope")
 
+
 def GetForegroundWindowTitle() -> Optional[str]:
     hWnd = windll.user32.GetForegroundWindow()
     length = windll.user32.GetWindowTextLengthW(hWnd)
@@ -32,38 +32,39 @@ def GetForegroundWindowTitle() -> Optional[str]:
 
 
 def performSilentShot(x, y, button, pressed):
-    global job
+    global job, configuration
 
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
                                                                                                     "") and pressed:
-        pydirectinput.PAUSE = 0
-        pydirectinput.mouseDown(button=pydirectinput.LEFT)
+        configuration = configFile.getConfiguration()
 
-        if targetTitle == "Modern Warfare":
-            time.sleep(0.02)
-        else:
-            time.sleep(0.04)
+        if configuration.get("silentshot", "enabled") == "1":
+            pydirectinput.PAUSE = 0
+            pydirectinput.mouseDown(button=pydirectinput.LEFT)
 
-        pydirectinput.mouseUp(button=pydirectinput.LEFT)
-        time.sleep((int(silentShotTimeBefore) / 1000))
-        pydirectinput.keyDown("%s" % silentShotLethalKey.lower())
-        time.sleep((int(silentShotTimeAfter) / 1000))
-        pydirectinput.keyDown("%s" % silentShotWeaponSwapKey.lower())
-        time.sleep(0.035)
-        pydirectinput.keyUp("%s" % silentShotWeaponSwapKey.lower())
-        time.sleep(0.025)
-        pydirectinput.keyUp("%s" % silentShotLethalKey.lower())
+            if targetTitle == "Modern Warfare":
+                time.sleep(0.02)
+            else:
+                time.sleep(0.04)
 
-        if exitScope:
-            pydirectinput.mouseUp(button=pydirectinput.RIGHT)
+            pydirectinput.mouseUp(button=pydirectinput.LEFT)
+            time.sleep((int(silentShotTimeBefore) / 1000))
+            pydirectinput.keyDown("%s" % silentShotLethalKey.lower())
+            time.sleep((int(silentShotTimeAfter) / 1000))
+            pydirectinput.keyDown("%s" % silentShotWeaponSwapKey.lower())
+            time.sleep(0.035)
+            pydirectinput.keyUp("%s" % silentShotWeaponSwapKey.lower())
+            time.sleep(0.025)
+            pydirectinput.keyUp("%s" % silentShotLethalKey.lower())
+
+            if exitScope:
+                pydirectinput.mouseUp(button=pydirectinput.RIGHT)
 
 
 def handleClick(x, y, button, pressed):
-    global job, configuration
+    global job
 
-    configuration = configFile.getConfiguration()
-
-    if button == Button.left and configuration.get("silentshot", "enabled") == "1":
+    if button == Button.left:
         if job is None or not job.is_alive():
             job = threading.Thread(target=performSilentShot, args=(x, y, button, pressed))
             job.start()
