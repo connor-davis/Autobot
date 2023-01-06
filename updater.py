@@ -14,8 +14,6 @@ from ttkbootstrap.constants import *
 
 import src.utils.configFile as configFile
 
-configuration = configFile.getConfiguration()
-
 load_dotenv()
 
 if __name__ == '__main__':
@@ -127,10 +125,14 @@ if __name__ == '__main__':
 
     print("Update has been completed.")
 
+    configuration = configFile.getConfiguration()
+
     configuration.set("settings", "version", versionTag)
 
     with open('data/configuration.ini', 'w') as configfile:
         configuration.write(configfile)
+        configfile.flush()
+        configfile.close()
 
     updaterLabel = ttb.Label(master=updaterFrame, text="Update finished.", font=("Impact", 13))
     updaterLabel.pack()

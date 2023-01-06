@@ -333,6 +333,8 @@ def runMainWindow(root):
         configuration.set("silentshot", "timeAfter", entryTimeAfterLethal.get())
         configuration.set("silentshot", "exitScope", "%d" % checkboxValue.get())
 
+        print(btnSilentShotLethalKeyText.get())
+
         configuration.set("slidecancel", "activatorKey", btnSlideCancelActivatorKeyText.get())
         configuration.set("slidecancel", "slideKey", btnSlideCancelSlideKeyText.get())
         configuration.set("slidecancel", "cancelKey", btnSlideCancelCancelKeyText.get())

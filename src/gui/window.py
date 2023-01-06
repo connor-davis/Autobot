@@ -10,21 +10,6 @@ import src.utils.configFile as configFile
 def initializeApp(root):
     mainWindow.runMainWindow(root)
 
-    root.update_idletasks()
-    root.update()
-
-    root.withdraw()
-    root.update_idletasks()
-
-    x = (root.winfo_screenwidth() - root.winfo_reqwidth()) / 2
-    y = (root.winfo_screenheight() - root.winfo_reqheight()) / 2
-    root.geometry("+%d+%d" % (x, y))
-
-    root.deiconify()
-    root.resizable(False, False)
-    root.mainloop()
-
-def runWindow(root):
     print("Initializing scripts.")
 
     configuration = configFile.getConfiguration()
@@ -41,4 +26,19 @@ def runWindow(root):
 
     initializeToggler()
 
+    root.update_idletasks()
+    root.update()
+
+    root.withdraw()
+    root.update_idletasks()
+
+    x = (root.winfo_screenwidth() - root.winfo_reqwidth()) / 2
+    y = (root.winfo_screenheight() - root.winfo_reqheight()) / 2
+    root.geometry("+%d+%d" % (x, y))
+
+    root.deiconify()
+    root.resizable(False, False)
+    root.mainloop()
+
+def runWindow(root):
     authWindow.runAuthWindow(root, initializeApp)

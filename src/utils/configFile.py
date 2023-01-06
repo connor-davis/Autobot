@@ -24,7 +24,7 @@ if not path.exists("data/configuration.ini"):
 
     configFile.set("settings", "targetGame", "Modern Warfare")
     configFile.set("settings", "theme", "darkly")
-    configFile.set("settings", "version", "0.0.9")
+    configFile.set("settings", "version", "0.1.2")
 
     with open(r"data/configuration.ini", 'w') as configfileObj:
         configFile.write(configfileObj)

@@ -5,14 +5,13 @@ import os
 import sys
 import uuid
 
+import subprocess
 import requests
 import ttkbootstrap as ttb
 from ttkbootstrap.constants import *
 from ttkbootstrap.dialogs import MessageDialog
 
-userHWID = hashlib.sha256(
-    (os.name + getpass.getuser() + str(hex(uuid.getnode()))).encode()).hexdigest()
-
+userHWID = str(subprocess.check_output('wmic csproduct get uuid'), 'utf-8').split('\n')[1].strip()
 
 def runAuthWindow(root, callback):
     authFrame = ttb.Frame(master=root)
