@@ -30,7 +30,7 @@ def runAuthWindow(root, callback):
         userPassword = passwordEntry.get()
 
         URL = "https://autobot.valupak.co.za"
-        DATA = {"identifier": "%s" % userEmail, "password": "%s" % userPassword}
+        DATA = {"identifier": "%s" % userEmail.replace(" ", ""), "password": "%s" % userPassword.replace(" ", "")}
 
         authResponse = requests.post(url="%s%s" % (URL, "/api/auth/local"), data=DATA)
 
