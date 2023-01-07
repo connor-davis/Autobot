@@ -339,20 +339,26 @@ def runMainWindow(root):
         configuration.set("slidecancel", "slideKey", btnSlideCancelSlideKeyText.get())
         configuration.set("slidecancel", "cancelKey", btnSlideCancelCancelKeyText.get())
 
-        with open('data/configuration.ini', 'w') as configfile:
+        with open('data/configuration.yml', 'w') as configfile:
             configuration.write(configfile)
             configfile.flush()
             configfile.close()
 
         print("Uninitializing scripts.")
 
-        uninitializeSilentShot()
-        uninitializeSlideCancel()
+        if configuration.get("silentshot", "enabled") == "1":
+            uninitializeSilentShot()
+
+        if configuration.get("slidecancel", "enabled") == "1":
+            uninitializeSlideCancel()
 
         print("Initializing scripts.")
 
-        initializeSilentShot()
-        initializeSlideCancel()
+        if configuration.get("silentshot", "enabled") == "1":
+            initializeSilentShot()
+
+        if configuration.get("slidecancel", "enabled") == "1":
+            initializeSlideCancel()
 
     applyChangesButton = ttb.Button(master=root, text="Apply Changes", command=applyChanges, style="success")
     applyChangesButton.pack(fill=X, expand=True, pady=5, padx=5)

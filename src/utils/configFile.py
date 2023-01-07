@@ -1,38 +1,60 @@
 import configparser
 from os import path
 
+import yaml
+
 configFile = configparser.ConfigParser()
 
-if not path.exists("data/configuration.ini"):
-    configFile.add_section("silentshot")
+if not path.exists("data/configuration.yml"):
+    configuration = {
+        "silentshot": {
+            "lethalKey": "j",
+            "weaponSwapKey": "1",
+            "timeBefore": "1",
+            "timeAfter": "30",
+            "exitScope": "1",
+            "enabled": "0"
+        },
+        "slidecancel": {
+            "activatorKey": "c",
+            "slideKey": "c",
+            "cancelKey": "space",
+            "enabled": "0"
+        },
+        "settings": {
+            "targetGame": "Modern Warfare",
+            "theme": "darkly",
+            "version": "0.1.4"
+        }
+    }
 
-    configFile.set("silentshot", "lethalKey", "j")
-    configFile.set("silentshot", "weaponSwapKey", "1")
-    configFile.set("silentshot", "timeBefore", "1")
-    configFile.set("silentshot", "timeAfter", "140")
-    configFile.set("silentshot", "exitScope", "1")
-    configFile.set("silentshot", "enabled", "0")
+    stream = open('data/configuration.yml', 'w')
+    yaml.dump(configuration, stream)
 
-    configFile.add_section("slidecancel")
+class YamlConfig:
+    def __init__(self, data):
+        self.data = data
 
-    configFile.set("slidecancel", "activatorKey", "c")
-    configFile.set("slidecancel", "slideKey", "c")
-    configFile.set("slidecancel", "cancelKey", "space")
-    configFile.set("slidecancel", "enabled", "0")
+    def get(self, section, key):
+        return self.data[section][key]
 
-    configFile.add_section("settings")
+    def getboolean(self, section, key):
+        return self.data[section][key] == "1" or self.data[section][key] is True
 
-    configFile.set("settings", "targetGame", "Modern Warfare")
-    configFile.set("settings", "theme", "darkly")
-    configFile.set("settings", "version", "0.1.2")
+    def getint(self, section, key):
+        return int(self.data[section][key])
 
-    with open(r"data/configuration.ini", 'w') as configfileObj:
-        configFile.write(configfileObj)
-        configfileObj.flush()
-        configfileObj.close()
+    def set(self, section, key, value):
+        self.data[section][key] = value
+
+    def write(self, f):
+        yaml.dump(self.data, f)
+
 
 def getConfiguration():
-    config = configparser.ConfigParser()
-    config.read('data/configuration.ini')
+    f = open('data/configuration.yml', 'r')
+    yamlConfig = yaml.load(f.read(), yaml.CLoader)
+    f.flush()
+    f.close()
 
-    return config
+    return YamlConfig(yamlConfig)

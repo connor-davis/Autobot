@@ -39,7 +39,7 @@ def handlePress(key):
 
             initializeSlideCancel()
 
-    with open('data/configuration.ini', 'w') as configfile:
+    with open('data/configuration.yml', 'w') as configfile:
         configuration.write(configfile)
         configfile.flush()
         configfile.close()

@@ -129,7 +129,7 @@ if __name__ == '__main__':
 
     configuration.set("settings", "version", versionTag)
 
-    with open('data/configuration.ini', 'w') as configfile:
+    with open('data/configuration.yml', 'w') as configfile:
         configuration.write(configfile)
         configfile.flush()
         configfile.close()

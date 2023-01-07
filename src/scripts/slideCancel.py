@@ -29,13 +29,17 @@ targetTitle = "Modern Warfare"
 
 
 def performSlideCancel():
-    global job, configuration
+    global job, configuration, slideCancelActivatorKey, slideCancelSlideKey, slideCancelCancelKey
 
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
                                                                                                     ""):
         configuration = configFile.getConfiguration()
+        slideCancelEnabled = configuration.get("slidecancel", "enabled") == "1"
+        slideCancelActivatorKey = configuration.get("slidecancel", "activatorKey")
+        slideCancelSlideKey = configuration.get("slidecancel", "slideKey")
+        slideCancelCancelKey = configuration.get("slidecancel", "cancelKey")
 
-        if configuration.getboolean("slidecancel", "enabled"):
+        if slideCancelEnabled:
             pydirectinput.PAUSE = 0
             pydirectinput.keyDown("%s" % slideCancelSlideKey.lower())
             time.sleep(0.08)
@@ -54,8 +58,6 @@ def performSlideCancel():
 
 def handlePress(key):
     global job, configuration
-
-
 
     if "{0}".format(key).replace("'", "") == slideCancelActivatorKey.lower():
         if job is None or not job.is_alive():

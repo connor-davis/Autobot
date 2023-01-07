@@ -32,11 +32,18 @@ def GetForegroundWindowTitle() -> Optional[str]:
 
 
 def performSilentShot(x, y, button, pressed):
-    global job, configuration
+    global job, configuration, targetTitle, silentShotTimeBefore, silentShotTimeAfter, silentShotLethalKey, silentShotWeaponSwapKey, exitScope
 
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
                                                                                                     "") and pressed:
         configuration = configFile.getConfiguration()
+
+        targetTitle = configuration.get("settings", "targetGame")
+        silentShotTimeBefore = configuration.getint("silentshot", "timeBefore")
+        silentShotTimeAfter = configuration.getint("silentshot", "timeAfter")
+        silentShotLethalKey = configuration.get("silentshot", "lethalKey")
+        silentShotWeaponSwapKey = configuration.get("silentshot", "weaponSwapKey")
+        exitScope = configuration.getboolean("silentshot", "exitScope")
 
         if configuration.get("silentshot", "enabled") == "1":
             pydirectinput.PAUSE = 0
