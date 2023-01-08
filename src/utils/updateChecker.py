@@ -68,12 +68,19 @@ def runUpdateChecker(root):
     print("Latest Version: %s, Major: %s, Minor: %s" % (version, versionMajor, versionMinor))
 
     if version > currentVersion or versionMajor > currentVersionMajor or versionMinor > currentVersionMinor:
-        okNo = Messagebox.yesno(parent=root, title="Autobot Updater",
-                                message="An update has been found, would you like to download it?")
+        okNo = Messagebox.yesno(parent=root,
+                                title="Autobot Updater",
+                                message="An update has been found, would you like to download it?"
+                                )
 
         if okNo == "Yes":
             if not path.exists("downloads/"):
                 mkdir("downloads/")
+
+            Messagebox.ok(parent=root,
+                          title="Autobot Updater",
+                          message="Please do not use your pc during this process. It will corrupt the installation."
+                          )
 
             downloadUrl = data["assets"][1]["browser_download_url"]
             fileName = data["assets"][1]["name"]
