@@ -12,18 +12,16 @@ configuration = configFile.getConfiguration()
 if __name__ == '__main__':
     root = ttb.Window(themename=configuration.get("settings", "theme"))
     root.title("Autobot")
-    iconFile = path.join("src", "assets", "logo.ico")
-    root.iconbitmap(iconFile)
 
-    root.overrideredirect(True)
+    iconFile = path.join("src", "assets", "logo.ico")
+
+    root.iconbitmap(iconFile)
 
     print("Running updater.")
 
     updater.runUpdateChecker(root)
 
     print("Running window.")
-
-    root.overrideredirect(False)
 
     window.runWindow(root)
 
