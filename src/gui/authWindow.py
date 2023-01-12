@@ -140,11 +140,17 @@ class AuthWindow(ctk.CTk):
 
         authData = authResponse.json()
 
-        authFile = open("data/auth.txt", "w")
-        authFile.write('%s:%s' % (userEmail, userPassword))
-        authFile.close()
-
         if "error" not in authData:
+            authFile = open("data/auth.txt", "w")
+            authFile.write('%s:%s' % (userEmail, userPassword))
+            authFile.flush()
+            authFile.close()
+
+            sessionFile = open("data/session.txt", "w")
+            sessionFile.write(authData["jwt"])
+            sessionFile.flush()
+            sessionFile.close()
+
             userId = authData["user"]["id"]
 
             HEADERS = {"Authorization": "Bearer %s" % authData["jwt"]}

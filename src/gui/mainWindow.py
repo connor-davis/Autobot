@@ -140,7 +140,7 @@ class MainWindow(ctk.CTk):
 
         self.slideCancelEnabledSwitch = ctk.CTkSwitch(
             master=self.tabs.tab("SS"),
-            text="",
+            text="Exit scope after silent shot?",
             command=self.silentShotExitScopeSwitchEvent,
             variable=self.silentShotExitScopeSwitchVar,
             onvalue="on",
