@@ -22,8 +22,6 @@ if __name__ == '__main__':
     iconFile = path.join("src", "assets", "logo.ico")
     root.iconbitmap(iconFile)
 
-    root.overrideredirect(True)
-
     if not path.exists("downloads/"):
         mkdir("downloads/")
 
