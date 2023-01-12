@@ -1,155 +1,180 @@
-import configparser
 import os
 import sys
-from os import mkdir, path
+import time
+from os import mkdir
+from os import path
+from tkinter.constants import *
 
+import customtkinter as ctk
 import requests
-import ttkbootstrap as ttb
-from PIL import Image, ImageTk
+from PIL import Image
 from dotenv import load_dotenv
-from ttkbootstrap.constants import *
-from ttkbootstrap.dialogs import Messagebox
+
 import src.utils.configFile as configFile
+
+ctk.set_appearance_mode("System")
+ctk.set_default_color_theme("green")
 
 load_dotenv()
 
-configuration = configFile.getConfiguration()
 
-def runUpdateChecker(root):
-    updaterFrame = ttb.Frame(master=root)
+class UpdateChecker(ctk.CTk):
+    def __init__(self):
+        super().__init__()
 
-    image = Image.open("src/assets/logo.png")
-    img = image.resize((96, 96))
-    file = ImageTk.PhotoImage(img)
+        self.title("Autobot Updater")
+        self.iconbitmap(path.join("src", "assets", "logo.ico"))
+        self.resizable(False, False)
 
-    updaterLabel = ttb.Label(master=updaterFrame, image=file)
-    updaterLabel.pack(pady=(0, 30), padx=50)
+        self.dialog = None
+        self.dialogFrame = None
+        self.updaterLabel = None
+        self.updaterProgressbar = None
+        self.data = None
+        self.configuration = configFile.getConfiguration()
 
-    updaterLabel = ttb.Label(master=updaterFrame, text="Checking for updates.", font=("Impact", 13))
-    updaterLabel.pack()
+        self.currentVersionTag = self.configuration.get("settings", "version")
+        self.currentVersionTagSplit = self.currentVersionTag.split(".")
+        self.currentVersion = self.currentVersionTagSplit[0]
+        self.currentVersionMajor = self.currentVersionTagSplit[1]
+        self.currentVersionMinor = self.currentVersionTagSplit[2]
 
-    updaterFrame.pack(pady=30, padx=30)
+        self.versionTag = None
+        self.versionTagSplit = None
+        self.version = None
+        self.versionMajor = None
+        self.versionMinor = None
 
-    root.update_idletasks()
-    root.update()
+        self.updaterFrame = ctk.CTkFrame(self, fg_color="#191919", corner_radius=0)
+        self.updaterInfoFrame = ctk.CTkFrame(self.updaterFrame, fg_color="#191919", corner_radius=0)
+        self.updaterInfoFrame.pack(padx=10, pady=20)
+        self.updaterFrame.pack()
 
-    root.withdraw()
-    root.update_idletasks()
+        self.updaterLogo = ctk.CTkLabel(
+            self.updaterInfoFrame,
+            text="",
+            image=ctk.CTkImage(
+                light_image=Image.open("src/assets/logo.png"),
+                dark_image=Image.open("src/assets/logo.png"),
+                size=(90, 90))
+        )
+        self.updaterLogo.pack(
+            padx=50,
+            pady=(0, 10)
+        )
 
-    x = (root.winfo_screenwidth() - root.winfo_reqwidth()) / 2
-    y = (root.winfo_screenheight() - root.winfo_reqheight()) / 2
-    root.geometry("+%d+%d" % (x, y))
+        self.setMessage(text="Checking for updates.")
 
-    root.deiconify()
-    root.update_idletasks()
-    root.update()
+        if self.hasNewVersion():
+            self.dialog = ctk.CTkToplevel(self)
+            self.dialog.title("Autobot Updater")
+            self.dialog.iconbitmap(path.join("src", "assets", "logo.ico"))
+            self.dialog.resizable(False, False)
 
-    currentVersionTag = configuration.get("settings", "version")
-    currentVersionTagSplit = currentVersionTag.split(".")
-    currentVersion = currentVersionTagSplit[0]
-    currentVersionMajor = currentVersionTagSplit[1]
-    currentVersionMinor = currentVersionTagSplit[2]
+            self.dialogFrame = ctk.CTkFrame(self.dialog, fg_color="#191919", corner_radius=0)
+            self.dialogFrame.pack()
 
-    print("Fetching latest release")
+            messageLabel = ctk.CTkLabel(self.dialogFrame, text="An update has been found, would you like to download it?")
+            messageLabel.pack(padx=20, pady=(20, 10))
 
-    URL = "https://api.github.com/repos/connor-davis/Autobot/releases/latest"
+            yesButton = ctk.CTkButton(self.dialogFrame, text="Yes", command=self.downloadLatestUpdate)
+            yesButton.pack(side=RIGHT, padx=(10, 20), pady=(0, 20), expand=True, fill=X)
 
-    r = requests.get(url=URL)
+            noButton = ctk.CTkButton(self.dialogFrame, text="No", command=self.destroy)
+            noButton.pack(side=RIGHT, padx=(20, 0), pady=(0, 20), expand=True, fill=X)
+        else:
+            self.destroy()
 
-    data = r.json()
+    def downloadLatestUpdate(self):
+        self.dialog.destroy()
 
-    versionTag = data["tag_name"]
-    versionTagSplit = versionTag.split(".")
-    version = versionTagSplit[0]
-    versionMajor = versionTagSplit[1]
-    versionMinor = versionTagSplit[2]
+        if not path.exists("downloads/"):
+            mkdir("downloads/")
 
-    print("Current Version: %s, Major: %s, Minor: %s" % (currentVersion, currentVersionMajor, currentVersionMinor))
-    print("Latest Version: %s, Major: %s, Minor: %s" % (version, versionMajor, versionMinor))
+        self.dialog = ctk.CTkToplevel(self)
+        self.dialog.title("Autobot Updater")
+        self.dialog.iconbitmap(path.join("src", "assets", "logo.ico"))
+        self.dialog.resizable(False, False)
 
-    if version > currentVersion or versionMajor > currentVersionMajor or versionMinor > currentVersionMinor:
-        okNo = Messagebox.yesno(parent=root,
-                                title="Autobot Updater",
-                                message="An update has been found, would you like to download it?"
-                                )
+        self.dialogFrame = ctk.CTkFrame(self.dialog, fg_color="#191919", corner_radius=0)
+        self.dialogFrame.pack()
 
-        if okNo == "Yes":
-            if not path.exists("downloads/"):
-                mkdir("downloads/")
+        messageLabel = ctk.CTkLabel(self.dialogFrame,
+                                    text="Please do not use your pc during this process. It will corrupt the installation.")
+        messageLabel.pack(padx=20, pady=(20, 10))
 
-            Messagebox.ok(parent=root,
-                          title="Autobot Updater",
-                          message="Please do not use your pc during this process. It will corrupt the installation."
-                          )
+        okButton = ctk.CTkButton(self.dialogFrame, text="Ok", command=self.beginDownload)
+        okButton.pack(side=RIGHT, padx=(10, 20), pady=(0, 20))
 
-            downloadUrl = data["assets"][1]["browser_download_url"]
-            fileName = data["assets"][1]["name"]
+    def beginDownload(self):
+        self.dialog.destroy()
 
-            updaterLabel.destroy()
+        downloadUrl = self.data["assets"][1]["browser_download_url"]
+        fileName = self.data["assets"][1]["name"]
 
-            updaterLabel = ttb.Label(master=updaterFrame, text="Downloading updater.", font=("Impact", 13))
-            updaterLabel.pack(pady=(0, 10))
+        self.setMessage("Downloading updater.")
 
-            updaterProgressbar = ttb.Progressbar(master=updaterFrame, bootstyle="success", maximum=100,
-                                                 value=0)
-            updaterProgressbar.pack(fill=X, expand=True)
+        self.updaterProgressbar = ctk.CTkProgressBar(
+            master=self.updaterInfoFrame,
+        )
+        self.updaterProgressbar.set(0)
+        self.updaterProgressbar.pack(fill=X, expand=True)
 
-            updaterFrame.pack()
+        self.update_idletasks()
+        self.update()
 
-            root.update_idletasks()
-            root.update()
+        with open("%s" % fileName, "wb") as f:
+            response = requests.get(downloadUrl, stream=True)
+            totalLength = response.headers.get('content-length')
 
-            print("New version found. Downloading.")
+            if totalLength is None:
+                f.write(response.content)
+            else:
+                dl = 0
+                totalLength = int(totalLength)
 
-            root.update_idletasks()
-            root.update()
+                for data in response.iter_content(chunk_size=4096):
+                    dl += len(data)
+                    f.write(data)
+                    done = int(100 * dl / totalLength)
 
-            with open("%s" % fileName, "wb") as f:
-                print("Downloading %s" % fileName)
+                    self.updaterProgressbar.set(done / 100)
+                    self.update_idletasks()
+                    self.update()
 
-                response = requests.get(downloadUrl, stream=True)
-                totalLength = response.headers.get('content-length')
+        self.setMessage("Launching updater.")
 
-                if totalLength is None:
-                    f.write(response.content)
-                else:
-                    dl = 0
-                    totalLength = int(totalLength)
+        self.updaterProgressbar.destroy()
 
-                    for data in response.iter_content(chunk_size=4096):
-                        dl += len(data)
-                        f.write(data)
-                        done = int(100 * dl / totalLength)
+        self.update_idletasks()
+        self.update()
 
-                        updaterProgressbar.destroy()
-                        updaterProgressbar = ttb.Progressbar(master=updaterFrame, bootstyle="success",
-                                                             maximum=100, value=done, mode="determinate")
-                        updaterProgressbar.pack(fill=X, expand=True)
+        time.sleep(1)
 
-                        updaterFrame.pack()
+        os.startfile("%s\\AutobotUpdater.exe" % os.curdir)
 
-                        root.update_idletasks()
-                        root.update()
+        sys.exit(0)
 
-            updaterLabel.destroy()
+    def hasNewVersion(self):
+        URL = "https://api.github.com/repos/connor-davis/Autobot/releases/latest"
 
-            updaterLabel = ttb.Label(master=updaterFrame, text="Launching updater.", font=("Impact", 13))
-            updaterLabel.pack()
+        r = requests.get(url=URL)
 
-            updaterProgressbar.destroy()
+        self.data = r.json()
 
-            updaterFrame.pack()
+        self.versionTag = self.data["tag_name"]
+        self.versionTagSplit = self.versionTag.split(".")
+        self.version = self.versionTagSplit[0]
+        self.versionMajor = self.versionTagSplit[1]
+        self.versionMinor = self.versionTagSplit[2]
 
-            root.update_idletasks()
-            root.update()
+        return self.version > self.currentVersion or self.versionMajor > self.currentVersionMajor or self.versionMinor > self.currentVersionMinor
 
-            updaterFrame.destroy()
+    def setMessage(self, text: str):
+        if self.updaterLabel:
+            self.updaterLabel.destroy()
 
-            os.startfile("%s\\AutobotUpdater.exe" % os.curdir)
-
-            sys.exit(0)
-
-    updaterFrame.destroy()
-
-    root.update_idletasks()
-    root.update()
+        self.updaterLabel = ctk.CTkLabel(self.updaterInfoFrame, text=text)
+        self.updaterLabel.pack()
+        self.update_idletasks()
+        self.update()

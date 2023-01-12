@@ -30,6 +30,8 @@ if not path.exists("data/configuration.yml"):
 
     stream = open('data/configuration.yml', 'w')
     yaml.dump(configuration, stream)
+    stream.flush()
+    stream.close()
 
 class YamlConfig:
     def __init__(self, data):

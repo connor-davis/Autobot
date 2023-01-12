@@ -1,35 +1,139 @@
-import configparser
-import getpass
-import hashlib
-import os
-import sys
-import uuid
-
 import subprocess
+import tkinter
+from os import path
+from tkinter.constants import *
+
+import customtkinter as ctk
 import requests
-import ttkbootstrap as ttb
-from ttkbootstrap.constants import *
-from ttkbootstrap.dialogs import MessageDialog
+from PIL import Image
+
+import src.utils.configFile as configFile
+
+ctk.set_appearance_mode("System")
+ctk.set_default_color_theme("green")
 
 userHWID = str(subprocess.check_output('wmic csproduct get uuid'), 'utf-8').split('\n')[1].strip()
 
-def runAuthWindow(root, callback):
-    authFrame = ttb.Frame(master=root)
 
-    labelHeading = ttb.Label(master=authFrame, text="Autobot Auth", font=("Impact", 24))
-    labelHeading.pack(pady=10, padx=10)
+class AuthWindow(ctk.CTk):
+    def __init__(self):
+        super().__init__()
 
-    labelDescription = ttb.Label(
-        master=authFrame,
-        text="Please enter your license key to use the app.",
-        font="Arial", wraplength=400)
-    labelDescription.pack(pady=(5, 50), padx=5)
+        self.configuration = configFile.getConfiguration()
 
-    def setUserKey():
-        userEmail = emailEntry.get()
-        userPassword = passwordEntry.get()
+        # configure window
+        self.title("Autobot")
+        self.iconbitmap(path.join("src", "assets", "logo.ico"))
+        self.resizable(False, False)
 
-        URL = "http://197.81.132.129:1337/"
+        self.authFrame = ctk.CTkFrame(
+            self,
+            fg_color="#171717",
+            corner_radius=0
+        )
+        self.loginCardBorder = ctk.CTkFrame(
+            self.authFrame,
+            fg_color="#404040",
+            corner_radius=5
+        )
+        self.loginCard = ctk.CTkFrame(
+            self.loginCardBorder,
+            fg_color="#262626",
+            corner_radius=4
+        )
+
+        self.loginLogo = ctk.CTkLabel(
+            self.loginCard,
+            text="",
+            image=ctk.CTkImage(
+                light_image=Image.open("src/assets/logo.png"),
+                dark_image=Image.open("src/assets/logo.png"),
+                size=(90, 90))
+        )
+        self.loginLogo.pack(
+            padx=100,
+            pady=(20, 10)
+        )
+
+        authFile = open("data/auth.txt", "r")
+        data = authFile.read()
+        userEmail = data.split(":")[0]
+        userPassword = data.split(":")[1]
+
+        self.loginLabel = ctk.CTkLabel(
+            self.loginCard,
+            text="Log In",
+            text_color="white",
+            font=("Arial", 24, "bold")
+        )
+        self.loginLabel.pack()
+
+        self.loginEmailVar = tkinter.StringVar(
+            self,
+            value=userEmail
+        )
+
+        self.loginEmailLabel = ctk.CTkLabel(self.loginCard, text="Email")
+        self.loginEmailLabel.pack(anchor=W, padx=(20, 0), pady=(30, 5))
+        self.loginEmailEntry = ctk.CTkEntry(
+            self.loginCard,
+            textvariable=self.loginEmailVar,
+            fg_color="#171717",
+            border_width=1,
+            border_color="#404040",
+            corner_radius=5)
+        self.loginEmailEntry.pack(
+            pady=(0, 5),
+            padx=20,
+            expand=True,
+            fill=X
+        )
+
+        self.loginPasswordVar = tkinter.StringVar(
+            self,
+            value=userPassword
+        )
+
+        self.loginPasswordLabel = ctk.CTkLabel(self.loginCard, text="Password")
+        self.loginPasswordLabel.pack(anchor=W, padx=(20, 0), pady=(0, 5))
+        self.loginPasswordEntry = ctk.CTkEntry(
+            self.loginCard,
+            show="*",
+            textvariable=self.loginPasswordVar,
+            fg_color="#171717",
+            border_width=1,
+            border_color="#404040",
+            corner_radius=5
+        )
+        self.loginPasswordEntry.pack(
+            pady=(0, 30),
+            padx=20,
+            expand=True,
+            fill=X
+        )
+
+        self.loginButton = ctk.CTkButton(self.loginCard, text="Login", text_color="white", fg_color="#191919",
+                                         command=self.login)
+        self.loginButton.pack(pady=(0, 20), padx=20, expand=True, fill=X)
+
+        self.loginCard.pack(
+            padx=1,
+            pady=1
+        )
+        self.loginCardBorder.pack(
+            padx=20,
+            pady=50
+        )
+        self.authFrame.pack(
+            padx=0,
+            pady=0
+        )
+
+    def login(self):
+        userEmail = self.loginEmailVar.get()
+        userPassword = self.loginPasswordVar.get()
+
+        URL = "http://197.81.132.129:1337"
         DATA = {"identifier": "%s" % userEmail.strip(), "password": "%s" % userPassword.strip()}
 
         authResponse = requests.post(url="%s%s" % (URL, "/api/auth/local"), data=DATA)
@@ -57,64 +161,77 @@ def runAuthWindow(root, callback):
                     updateResponseData = updateResponse.json()
 
                     if "paid" in updateResponseData:
-                        if updateResponseData["paid"] is True:
-                            authFrame.destroy()
-                            callback(root)
+                        if updateResponseData["paid"] is not True:
+                            dialog = ctk.CTkToplevel(self)
+                            dialog.title("Autobot")
+                            dialog.iconbitmap(path.join("src", "assets", "logo.ico"))
+                            dialog.resizable(False, False)
+
+                            dialogFrame = ctk.CTkFrame(dialog, fg_color="#191919", corner_radius=0)
+                            dialogFrame.pack()
+
+                            dialogMessage = ctk.CTkLabel(dialogFrame, text="You need to pay your license.")
+                            dialogMessage.pack(padx=20, pady=(20, 10))
+
+                            okButton = ctk.CTkButton(dialogFrame, text="Ok", command=dialog.destroy)
+                            okButton.pack(side=RIGHT, padx=(10, 20), pady=(0, 20))
                         else:
-                            md = MessageDialog(parent=root, title="Autobot Message",
-                                               message="You have not paid for your license.",
-                                               buttons=["Ok"])
-                            md.show()
+                            self.destroy()
+                    else:
+                        dialog = ctk.CTkToplevel(self)
+                        dialog.title("Autobot")
+                        dialog.iconbitmap(path.join("src", "assets", "logo.ico"))
+                        dialog.resizable(False, False)
 
-                            authFrame.destroy()
-                            root.destroy()
-                            sys.exit(0)
+                        dialogFrame = ctk.CTkFrame(dialog, fg_color="#191919", corner_radius=0)
+                        dialogFrame.pack()
+
+                        dialogMessage = ctk.CTkLabel(dialogFrame, text="Your HWID is invalid.")
+                        dialogMessage.pack(padx=20, pady=(20, 10))
+
+                        okButton = ctk.CTkButton(dialogFrame, text="Ok", command=dialog.destroy)
+                        okButton.pack(side=RIGHT, padx=(10, 20), pady=(0, 20))
                 else:
-                    md = MessageDialog(parent=root, title="Autobot Message",
-                                       message="Invalid account HWID.",
-                                       buttons=["Ok"])
-                    md.show()
+                    dialog = ctk.CTkToplevel(self)
+                    dialog.title("Autobot")
+                    dialog.iconbitmap(path.join("src", "assets", "logo.ico"))
+                    dialog.resizable(False, False)
 
-                    authFrame.destroy()
-                    root.destroy()
-                    sys.exit(0)
+                    dialogFrame = ctk.CTkFrame(dialog, fg_color="#191919", corner_radius=0)
+                    dialogFrame.pack()
+
+                    dialogMessage = ctk.CTkLabel(dialogFrame, text="Your HWID is invalid.")
+                    dialogMessage.pack(padx=20, pady=(20, 10))
+
+                    okButton = ctk.CTkButton(dialogFrame, text="Ok", command=dialog.destroy)
+                    okButton.pack(side=RIGHT, padx=(10, 20), pady=(0, 20))
+            else:
+                dialog = ctk.CTkToplevel(self)
+                dialog.title("Autobot")
+                dialog.iconbitmap(path.join("src", "assets", "logo.ico"))
+                dialog.resizable(False, False)
+
+                dialogFrame = ctk.CTkFrame(dialog, fg_color="#191919", corner_radius=0)
+                dialogFrame.pack()
+
+                dialogMessage = ctk.CTkLabel(dialogFrame, text="Your HWID is invalid.")
+                dialogMessage.pack(padx=20, pady=(20, 10))
+
+                okButton = ctk.CTkButton(dialogFrame, text="Ok", command=dialog.destroy)
+                okButton.pack(side=RIGHT, padx=(10, 20), pady=(0, 20))
         else:
-            md = MessageDialog(parent=root, title="Autobot Message", message=authData["error"]["message"],
-                               buttons=["Ok"])
-            md.show()
+            print(authData["error"]["message"])
 
-            authFrame.destroy()
-            root.destroy()
-            sys.exit(0)
+            dialog = ctk.CTkToplevel(self)
+            dialog.title("Autobot")
+            dialog.iconbitmap(path.join("src", "assets", "logo.ico"))
+            dialog.resizable(False, False)
 
-    email = ""
-    password = ""
+            dialogFrame = ctk.CTkFrame(dialog, fg_color="#191919", corner_radius=0)
+            dialogFrame.pack()
 
-    if os.path.exists("data/auth.txt"):
-        authFile = open("data/auth.txt", "r")
-        authFileSplit = authFile.read().split(":")
-        email = authFileSplit[0]
-        password = authFileSplit[1]
+            dialogMessage = ctk.CTkLabel(dialogFrame, text=authData["error"]["message"])
+            dialogMessage.pack(padx=20, pady=(20, 10))
 
-    emailLabel = ttb.Label(master=authFrame, text="Email")
-    emailLabel.pack(pady=5, padx=5, fill=X, expand=True)
-    emailEntry = ttb.Entry(master=authFrame, bootstyle="success")
-    emailEntry.insert(0, email)
-    emailEntry.pack(pady=5, padx=5, fill=X, expand=True)
-
-    passwordLabel = ttb.Label(master=authFrame, text="Password")
-    passwordLabel.pack(pady=5, padx=5, fill=X, expand=True)
-    passwordEntry = ttb.Entry(master=authFrame, bootstyle="success", show="*")
-    passwordEntry.insert(0, password)
-    passwordEntry.pack(pady=5, padx=5, fill=X, expand=True)
-
-    continueButton = ttb.Button(master=authFrame, text="Continue", bootstyle="success", command=setUserKey)
-    continueButton.pack(pady=5, padx=5, fill=X, expand=True)
-
-    authFrame.pack(padx=5, pady=50)
-
-    root.update_idletasks()
-    root.update()
-
-    root.resizable(False, False)
-    root.mainloop()
+            okButton = ctk.CTkButton(dialogFrame, text="Ok", command=dialog.destroy)
+            okButton.pack(side=RIGHT, padx=(10, 20), pady=(0, 20))
