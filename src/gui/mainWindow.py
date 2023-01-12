@@ -10,7 +10,7 @@ from src.scripts.slideCancel import *
 import src.utils.configFile as configFile
 from src.utils.beeper import *
 
-ctk.set_appearance_mode("System")
+ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
 
 
@@ -46,6 +46,9 @@ class MainWindow(ctk.CTk):
         self.tabs.add("SS")
         self.tabs.add("SC")
         self.tabs.add("RC")
+        self.tabs.add("RF")
+        self.tabs.add("AR")
+        self.tabs.add("YY")
         self.tabs.add("Settings")
 
         # Silent Shot
@@ -227,6 +230,49 @@ class MainWindow(ctk.CTk):
                                                        text_color="white",
                                                        font=("Arial", 12))
         self.rechamberCancelDescription.pack()
+
+        # Rapid Fire
+
+        self.rapidFireLabel = ctk.CTkLabel(self.tabs.tab("RF"), text="Rapid Fire", text_color="white",
+                                           font=("Arial", 16, "bold"))
+        self.rapidFireLabel.pack()
+
+        self.rapidFireDescription = ctk.CTkLabel(self.tabs.tab("RF"), text="Rapid Fire not available yet.",
+                                                 text_color="white",
+                                                 font=("Arial", 12))
+        self.rapidFireDescription.pack()
+
+        # Anti-Recoil
+
+        self.antiRecoilLabel = ctk.CTkLabel(self.tabs.tab("AR"), text="Anti-Recoil", text_color="white",
+                                           font=("Arial", 16, "bold"))
+        self.antiRecoilLabel.pack()
+
+        self.antiRecoilDescription = ctk.CTkLabel(
+             self.tabs.tab("AR"),
+             text="Anti-Recoil not available yet.",
+             text_color="white",
+             font=("Arial", 12)
+        )
+        self.antiRecoilDescription.pack()
+
+        # YY
+
+        self.yyLabel = ctk.CTkLabel(
+            self.tabs.tab("YY"),
+            text="Rapid Fire",
+            text_color="white",
+            font=("Arial", 16, "bold")
+        )
+        self.yyLabel.pack()
+
+        self.yyDescription = ctk.CTkLabel(
+            self.tabs.tab("YY"),
+            text="YY not available yet.",
+            text_color="white",
+            font=("Arial", 12)
+        )
+        self.yyDescription.pack()
 
         # Settings
 

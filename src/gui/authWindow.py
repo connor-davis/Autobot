@@ -9,7 +9,7 @@ from PIL import Image
 
 import src.utils.configFile as configFile
 
-ctk.set_appearance_mode("System")
+ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
 
 userHWID = str(subprocess.check_output('wmic csproduct get uuid'), 'utf-8').split('\n')[1].strip()
