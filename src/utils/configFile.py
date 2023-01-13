@@ -120,4 +120,4 @@ def getConfiguration():
             yamlConfig["yy"]["targetGame"] = "Modern Warfare"
             yamlConfig["yy"]["version"] = "0.1.9"
 
-        return YamlConfig(yamlConfig)
+    return YamlConfig(yamlConfig)
