@@ -33,6 +33,7 @@ if not path.exists("data/configuration.yml"):
     stream.flush()
     stream.close()
 
+
 class YamlConfig:
     def __init__(self, data):
         self.data = data
@@ -59,4 +60,64 @@ def getConfiguration():
     f.flush()
     f.close()
 
-    return YamlConfig(yamlConfig)
+    if yamlConfig is None:
+        yamlConfig = {
+            "silentshot": {
+                "lethalKey": "j",
+                "weaponSwapKey": "1",
+                "timeBefore": "1",
+                "timeAfter": "30",
+                "exitScope": "1",
+                "enabled": "0"
+            },
+            "slidecancel": {
+                "activatorKey": "c",
+                "slideKey": "c",
+                "cancelKey": "space",
+                "enabled": "0"
+            },
+            "yy": {
+                "enabled": "0",
+                "activatorKey": "e",
+                "weaponSwapKey": "1",
+                "delay": "100"
+            },
+            "settings": {
+                "targetGame": "Modern Warfare",
+                "version": "0.1.9"
+            }
+        }
+
+        try:
+            print("YY Enabled: %s" % yamlConfig["slidecancel"]["enabled"])
+        except TypeError:
+            yamlConfig["silentshot"]["enabled"] = "0"
+            yamlConfig["silentshot"]["lethalKey"] = "j"
+            yamlConfig["silentshot"]["weaponSwapKey"] = "1"
+            yamlConfig["silentshot"]["timeBefore"] = "1"
+            yamlConfig["silentshot"]["timeAfter"] = "60"
+            yamlConfig["silentshot"]["exitScope"] = "0"
+
+        try:
+            print("YY Enabled: %s" % yamlConfig["slidecancel"]["enabled"])
+        except TypeError:
+            yamlConfig["slidecancel"]["enabled"] = "0"
+            yamlConfig["slidecancel"]["activatorKey"] = "c"
+            yamlConfig["slidecancel"]["slideKey"] = "c"
+            yamlConfig["slidecancel"]["cancelKey"] = "space"
+
+        try:
+            print("YY Enabled: %s" % yamlConfig["yy"]["enabled"])
+        except TypeError:
+            yamlConfig["yy"]["enabled"] = "0"
+            yamlConfig["yy"]["activatorKey"] = "e"
+            yamlConfig["yy"]["weaponSwapKey"] = "1"
+            yamlConfig["yy"]["delay"] = "100"
+
+        try:
+            print("Autobot Version: v%s" % yamlConfig["settings"]["version"])
+        except TypeError:
+            yamlConfig["yy"]["targetGame"] = "Modern Warfare"
+            yamlConfig["yy"]["version"] = "0.1.9"
+
+        return YamlConfig(yamlConfig)
