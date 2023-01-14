@@ -1,4 +1,5 @@
 import configparser
+import time
 from os import path
 
 import yaml
@@ -7,31 +8,31 @@ configFile = configparser.ConfigParser()
 
 if not path.exists("data/configuration.yml"):
     configuration = {
-                "silentshot": {
-                    "enabled": "0",
-                    "lethalKey": "j",
-                    "weaponSwapKey": "1",
-                    "timeBefore": "1",
-                    "timeAfter": "60",
-                    "exitScope": "0"
-                },
-                "slidecancel": {
-                    "enabled": "0",
-                    "activatorKey": "c",
-                    "slideKey": "c",
-                    "cancelKey": "space"
-                },
-                "yy": {
-                    "enabled": "0",
-                    "activatorKey": "e",
-                    "weaponSwapKey": "1",
-                    "delay": "100"
-                },
-                "settings": {
-                    "targetGame": "Modern Warfare",
-                    "version": "0.1.9"
-                }
-            }
+        "silentshot": {
+            "enabled": "0",
+            "lethalKey": "j",
+            "weaponSwapKey": "1",
+            "timeBefore": "1",
+            "timeAfter": "60",
+            "exitScope": "0"
+        },
+        "slidecancel": {
+            "enabled": "0",
+            "activatorKey": "c",
+            "slideKey": "c",
+            "cancelKey": "space"
+        },
+        "yy": {
+            "enabled": "0",
+            "activatorKey": "e",
+            "weaponSwapKey": "1",
+            "delay": "100"
+        },
+        "settings": {
+            "targetGame": "Modern Warfare",
+            "version": "0.2.0"
+        }
+    }
 
     stream = open('data/configuration.yml', 'w')
     yaml.dump(configuration, stream)
@@ -67,30 +68,39 @@ class YamlConfig:
                 },
                 "settings": {
                     "targetGame": "Modern Warfare",
-                    "version": "0.1.9"
+                    "version": "0.2.0"
                 }
             }
 
     def sectionExists(self, section):
-        if section not in self.data:
+        try:
+            return section not in self.data
+        except KeyError:
             return False
-        else:
-            return True
 
     def keyExists(self, section, key):
-        if key not in self.data[section]:
+        try:
+            return key not in self.data[section]
+        except KeyError:
             return False
-        else:
-            return True
 
     def get(self, section, key):
-        return self.data[section][key]
+        if section in self.data:
+            return self.data[section][key]
+        else:
+            return False
 
     def getboolean(self, section, key):
-        return self.data[section][key] == "1" or self.data[section][key] is True
+        if section in self.data:
+            return self.data[section][key] == "1" or self.data[section][key] is True
+        else:
+            return False
 
     def getint(self, section, key):
-        return int(self.data[section][key])
+        if section in self.data:
+            return int(self.data[section][key])
+        else:
+            return False
 
     def set(self, section, key, value):
         self.data[section][key] = value
@@ -100,7 +110,10 @@ class YamlConfig:
 
 
 def testConfiguration():
-    localConfiguration = getConfiguration()
+    f = open('data/configuration.yml', 'r')
+    yamlConfig = yaml.load(f.read(), yaml.CLoader)
+    f.flush()
+    f.close()
 
     required = {
         "silentshot": {
@@ -122,24 +135,31 @@ def testConfiguration():
             "activatorKey": "e",
             "weaponSwapKey": "1",
             "delay": "100"
+        },
+        "settings": {
+            "targetGame": "Modern Warfare",
+            "version": "0.2.0"
         }
     }
 
-    for section in required:
-        if not localConfiguration.sectionExists(section.lower()):
-            print("Section does not exist, creating %s " % section)
+    for sectionName in required:
 
-            for key in required[section.lower()]:
-                localConfiguration.set(section.lower(), required[section.lower()], required[section][key])
+        if sectionName not in yamlConfig:
+            print(sectionName)
+
+            yamlConfig[sectionName] = {}
+
+            for keyName in required[sectionName]:
+                yamlConfig[sectionName][keyName] = required[sectionName][keyName]
         else:
-            for key in required[section.lower()]:
-                print("key does not exist, creating %s " % key)
+            for keyName in required[sectionName]:
+                if keyName not in yamlConfig[sectionName]:
+                    print(keyName)
 
-                if not localConfiguration.keyExists(section.lower(), key):
-                    localConfiguration.set(section.lower(), required[section.lower()], required[section][key])
+                    yamlConfig[sectionName][keyName] = required[sectionName][keyName]
 
     with open("data/configuration.yml", "w") as file:
-        localConfiguration.write(file)
+        yaml.dump(yamlConfig, file)
         file.flush()
         file.close()
 

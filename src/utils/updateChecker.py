@@ -74,7 +74,8 @@ class UpdateChecker(ctk.CTk):
             self.dialogFrame = ctk.CTkFrame(self.dialog, fg_color="#191919", corner_radius=0)
             self.dialogFrame.pack()
 
-            messageLabel = ctk.CTkLabel(self.dialogFrame, text="An update has been found, would you like to download it?")
+            messageLabel = ctk.CTkLabel(self.dialogFrame,
+                                        text="An update has been found, would you like to download it?")
             messageLabel.pack(padx=20, pady=(20, 10))
 
             yesButton = ctk.CTkButton(self.dialogFrame, text="Yes", command=self.downloadLatestUpdate)
@@ -168,7 +169,15 @@ class UpdateChecker(ctk.CTk):
         self.versionMajor = self.versionTagSplit[1]
         self.versionMinor = self.versionTagSplit[2]
 
-        return self.version > self.currentVersion or self.versionMajor > self.currentVersionMajor or self.versionMinor > self.currentVersionMinor
+        return (
+            self.version,
+            self.versionMajor,
+            self.versionMinor
+        ) > (
+            self.currentVersion,
+            self.currentVersionMajor,
+            self.currentVersionMinor
+        )
 
     def setMessage(self, text: str):
         if self.updaterLabel:
