@@ -74,7 +74,7 @@ class UpdateChecker(ctk.CTk):
             self.dialogFrame.pack()
 
             messageLabel = ctk.CTkLabel(self.dialogFrame,
-                                        text="An update has been found, would you like to download it?")
+                                        text="An update has been found, would you like to download it?", text_color="white")
             messageLabel.pack(padx=20, pady=(20, 10))
 
             yesButton = ctk.CTkButton(self.dialogFrame, text="Yes", command=self.downloadLatestUpdate)
@@ -100,7 +100,7 @@ class UpdateChecker(ctk.CTk):
         self.dialogFrame.pack()
 
         messageLabel = ctk.CTkLabel(self.dialogFrame,
-                                    text="Please do not use your pc during this process. It will corrupt the installation.")
+                                    text="Please do not use your pc during this process. It will corrupt the installation.", text_color="white")
         messageLabel.pack(padx=20, pady=(20, 10))
 
         okButton = ctk.CTkButton(self.dialogFrame, text="Ok", command=self.beginDownload)
@@ -182,7 +182,7 @@ class UpdateChecker(ctk.CTk):
         if self.updaterLabel:
             self.updaterLabel.destroy()
 
-        self.updaterLabel = ctk.CTkLabel(self.updaterInfoFrame, text=text)
+        self.updaterLabel = ctk.CTkLabel(self.updaterInfoFrame, text=text, text_color="white")
         self.updaterLabel.pack()
         self.update_idletasks()
         self.update()

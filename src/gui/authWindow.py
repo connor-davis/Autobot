@@ -72,12 +72,13 @@ class AuthWindow(ctk.CTk):
             value=userEmail
         )
 
-        self.loginEmailLabel = ctk.CTkLabel(self.loginCard, text="Email")
+        self.loginEmailLabel = ctk.CTkLabel(self.loginCard, text="Email", text_color="white")
         self.loginEmailLabel.pack(anchor=W, padx=(20, 0), pady=(30, 5))
         self.loginEmailEntry = ctk.CTkEntry(
             self.loginCard,
             textvariable=self.loginEmailVar,
             fg_color="#171717",
+            text_color="white",
             border_width=1,
             border_color="#404040",
             corner_radius=5)
@@ -93,13 +94,14 @@ class AuthWindow(ctk.CTk):
             value=userPassword
         )
 
-        self.loginPasswordLabel = ctk.CTkLabel(self.loginCard, text="Password")
+        self.loginPasswordLabel = ctk.CTkLabel(self.loginCard, text="Password", text_color="white")
         self.loginPasswordLabel.pack(anchor=W, padx=(20, 0), pady=(0, 5))
         self.loginPasswordEntry = ctk.CTkEntry(
             self.loginCard,
             show="*",
             textvariable=self.loginPasswordVar,
             fg_color="#171717",
+            text_color="white",
             border_width=1,
             border_color="#404040",
             corner_radius=5
@@ -170,7 +172,7 @@ class AuthWindow(ctk.CTk):
                             dialogFrame = ctk.CTkFrame(dialog, fg_color="#191919", corner_radius=0)
                             dialogFrame.pack()
 
-                            dialogMessage = ctk.CTkLabel(dialogFrame, text="You need to pay your license.")
+                            dialogMessage = ctk.CTkLabel(dialogFrame, text="You need to pay your license.", text_color="white")
                             dialogMessage.pack(padx=20, pady=(20, 10))
 
                             okButton = ctk.CTkButton(dialogFrame, text="Ok", command=dialog.destroy)
@@ -191,7 +193,7 @@ class AuthWindow(ctk.CTk):
                         dialogFrame = ctk.CTkFrame(dialog, fg_color="#191919", corner_radius=0)
                         dialogFrame.pack()
 
-                        dialogMessage = ctk.CTkLabel(dialogFrame, text="Your HWID is invalid.")
+                        dialogMessage = ctk.CTkLabel(dialogFrame, text="Your pc is invalid.", text_color="white")
                         dialogMessage.pack(padx=20, pady=(20, 10))
 
                         okButton = ctk.CTkButton(dialogFrame, text="Ok", command=dialog.destroy)
@@ -205,7 +207,7 @@ class AuthWindow(ctk.CTk):
                     dialogFrame = ctk.CTkFrame(dialog, fg_color="#191919", corner_radius=0)
                     dialogFrame.pack()
 
-                    dialogMessage = ctk.CTkLabel(dialogFrame, text="Your HWID is invalid.")
+                    dialogMessage = ctk.CTkLabel(dialogFrame, text="Your pc is invalid.", text_color="white")
                     dialogMessage.pack(padx=20, pady=(20, 10))
 
                     okButton = ctk.CTkButton(dialogFrame, text="Ok", command=dialog.destroy)
@@ -219,7 +221,7 @@ class AuthWindow(ctk.CTk):
                 dialogFrame = ctk.CTkFrame(dialog, fg_color="#191919", corner_radius=0)
                 dialogFrame.pack()
 
-                dialogMessage = ctk.CTkLabel(dialogFrame, text="Your HWID is invalid.")
+                dialogMessage = ctk.CTkLabel(dialogFrame, text="Your pc is invalid.", text_color="white")
                 dialogMessage.pack(padx=20, pady=(20, 10))
 
                 okButton = ctk.CTkButton(dialogFrame, text="Ok", command=dialog.destroy)
@@ -235,7 +237,7 @@ class AuthWindow(ctk.CTk):
             dialogFrame = ctk.CTkFrame(dialog, fg_color="#191919", corner_radius=0)
             dialogFrame.pack()
 
-            dialogMessage = ctk.CTkLabel(dialogFrame, text=authData["error"]["message"])
+            dialogMessage = ctk.CTkLabel(dialogFrame, text=authData["error"]["message"], text_color="white")
             dialogMessage.pack(padx=20, pady=(20, 10))
 
             okButton = ctk.CTkButton(dialogFrame, text="Ok", command=dialog.destroy)

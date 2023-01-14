@@ -2,13 +2,10 @@ from os import path
 from tkinter.constants import *
 
 import customtkinter as ctk
-from pynput import keyboard
 
 from src.scripts.silentShot import *
 from src.scripts.slideCancel import *
 from src.scripts.yy import *
-
-import src.utils.configFile as configFile
 from src.utils.beeper import *
 
 ctk.set_default_color_theme("green")
@@ -64,7 +61,7 @@ class MainWindow(ctk.CTk):
 
         self.statusFrame = ctk.CTkFrame(self.tabs.tab("SS"), fg_color="#191919")
 
-        self.silentShotEnabledLabel = ctk.CTkLabel(self.statusFrame, text="Is Enabled?")
+        self.silentShotEnabledLabel = ctk.CTkLabel(self.statusFrame, text="Is Enabled?", text_color="white")
         self.silentShotEnabledLabel.pack(side=RIGHT, padx=(0, 5))
         self.silentShotSwitchVar = ctk.StringVar(value="on")
 
@@ -76,6 +73,7 @@ class MainWindow(ctk.CTk):
         self.slideCancelEnabledSwitch = ctk.CTkSwitch(
             master=self.statusFrame,
             text="",
+            text_color="white",
             command=self.silentShotSwitchEvent,
             variable=self.silentShotSwitchVar,
             onvalue="on",
@@ -87,36 +85,39 @@ class MainWindow(ctk.CTk):
 
         self.silentShotLethalKeyVar = ctk.StringVar(value=self.silentShotLethalKey)
 
-        self.silentShotLethalKeyLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Lethal Key, e.g. F")
+        self.silentShotLethalKeyLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Lethal Key, e.g. F", text_color="white")
         self.silentShotLethalKeyLabel.pack(pady=(10, 0), padx=5, anchor=W)
 
         self.silentShotLethalKeyButton = ctk.CTkButton(
             self.tabs.tab("SS"),
             textvariable=self.silentShotLethalKeyVar,
+            text_color="white",
             command=self.getSilentShotLethalKey
         )
         self.silentShotLethalKeyButton.pack(pady=10, padx=5, fill=X)
 
         self.silentShotWeaponSwapKeyVar = ctk.StringVar(value=self.silentShotWeaponSwapKey)
 
-        self.silentShotWeaponSwapKeyLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Weapon Swap Key, e.g. 1")
+        self.silentShotWeaponSwapKeyLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Weapon Swap Key, e.g. 1", text_color="white")
         self.silentShotWeaponSwapKeyLabel.pack(padx=5, anchor=W)
 
         self.silentShotWeaponSwapKeyButton = ctk.CTkButton(
             self.tabs.tab("SS"),
             textvariable=self.silentShotWeaponSwapKeyVar,
+            text_color="white",
             command=self.getSilentShotWeaponSwapKey
         )
         self.silentShotWeaponSwapKeyButton.pack(pady=10, padx=5, fill=X)
 
         self.silentShotTimeBeforeVar = ctk.StringVar(value=self.silentShotTimeBefore)
 
-        self.silentShotTimeBeforeLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Time Before, e.g. 1")
+        self.silentShotTimeBeforeLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Time Before, e.g. 1", text_color="white")
         self.silentShotTimeBeforeLabel.pack(padx=5, pady=(0, 5), anchor=W)
 
         self.silentShotTimeBeforeEntry = ctk.CTkEntry(
             self.tabs.tab("SS"),
             textvariable=self.silentShotTimeBeforeVar,
+            text_color="white",
             fg_color="#171717",
             border_width=1,
             border_color="#404040",
@@ -126,12 +127,13 @@ class MainWindow(ctk.CTk):
 
         self.silentShotTimeAfterVar = ctk.StringVar(value=self.silentShotTimeAfter)
 
-        self.silentShotTimeAfterLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Time After, e.g. 140")
+        self.silentShotTimeAfterLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Time After, e.g. 140", text_color="white")
         self.silentShotTimeAfterLabel.pack(padx=5, pady=(0, 5), anchor=W)
 
         self.silentShotTimeAfterEntry = ctk.CTkEntry(
             self.tabs.tab("SS"),
             textvariable=self.silentShotTimeAfterVar,
+            text_color="white",
             fg_color="#171717",
             border_width=1,
             border_color="#404040",
@@ -151,6 +153,7 @@ class MainWindow(ctk.CTk):
             text="Exit scope after silent shot?",
             command=self.silentShotExitScopeSwitchEvent,
             variable=self.silentShotExitScopeSwitchVar,
+            text_color="white",
             onvalue="on",
             offvalue="off"
         )
@@ -168,7 +171,7 @@ class MainWindow(ctk.CTk):
 
         self.slideCancelStatusFrame = ctk.CTkFrame(self.tabs.tab("SC"), fg_color="#191919")
 
-        self.slideCancelEnabledLabel = ctk.CTkLabel(self.slideCancelStatusFrame, text="Is Enabled?")
+        self.slideCancelEnabledLabel = ctk.CTkLabel(self.slideCancelStatusFrame, text="Is Enabled?", text_color="white")
         self.slideCancelEnabledLabel.pack(side=RIGHT, padx=(0, 5))
         self.slideCancelSwitchVar = ctk.StringVar(value="on")
 
@@ -191,36 +194,39 @@ class MainWindow(ctk.CTk):
 
         self.slideCancelActivatorKeyVar = ctk.StringVar(value=self.slideCancelActivatorKey)
 
-        self.slideCancelActivatorKeyLabel = ctk.CTkLabel(self.tabs.tab("SC"), text="Activator Key, e.g. c")
+        self.slideCancelActivatorKeyLabel = ctk.CTkLabel(self.tabs.tab("SC"), text="Activator Key, e.g. c", text_color="white")
         self.slideCancelActivatorKeyLabel.pack(padx=5, anchor=W)
 
         self.slideCancelActivatorKeyButton = ctk.CTkButton(
             self.tabs.tab("SC"),
             textvariable=self.slideCancelActivatorKeyVar,
+            text_color="white",
             command=self.getSlideCancelActivatorKey
         )
         self.slideCancelActivatorKeyButton.pack(pady=10, padx=5, fill=X)
 
         self.slideCancelSlideKeyVar = ctk.StringVar(value=self.slideCancelSlideKey)
 
-        self.slideCancelSlideKeyLabel = ctk.CTkLabel(self.tabs.tab("SC"), text="Slide Key, e.g. c")
+        self.slideCancelSlideKeyLabel = ctk.CTkLabel(self.tabs.tab("SC"), text="Slide Key, e.g. c", text_color="white")
         self.slideCancelSlideKeyLabel.pack(padx=5, anchor=W)
 
         self.slideCancelSlideKeyButton = ctk.CTkButton(
             self.tabs.tab("SC"),
             textvariable=self.slideCancelSlideKeyVar,
+            text_color="white",
             command=self.getSlideCancelSlideKey
         )
         self.slideCancelSlideKeyButton.pack(pady=10, padx=5, fill=X)
 
         self.slideCancelCancelKeyVar = ctk.StringVar(value=self.slideCancelCancelKey)
 
-        self.slideCancelCancelKeyLabel = ctk.CTkLabel(self.tabs.tab("SC"), text="Cancel Key, e.g. space")
+        self.slideCancelCancelKeyLabel = ctk.CTkLabel(self.tabs.tab("SC"), text="Cancel Key, e.g. space", text_color="white")
         self.slideCancelCancelKeyLabel.pack(padx=5, anchor=W)
 
         self.slideCancelCancelKeyButton = ctk.CTkButton(
             self.tabs.tab("SC"),
             textvariable=self.slideCancelCancelKeyVar,
+            text_color="white",
             command=self.getSlideCancelCancelKey
         )
         self.slideCancelCancelKeyButton.pack(pady=10, padx=5, fill=X)
@@ -250,14 +256,14 @@ class MainWindow(ctk.CTk):
         # Anti-Recoil
 
         self.antiRecoilLabel = ctk.CTkLabel(self.tabs.tab("AR"), text="Anti-Recoil", text_color="white",
-                                           font=("Arial", 16, "bold"))
+                                            font=("Arial", 16, "bold"))
         self.antiRecoilLabel.pack()
 
         self.antiRecoilDescription = ctk.CTkLabel(
-             self.tabs.tab("AR"),
-             text="Anti-Recoil not available yet.",
-             text_color="white",
-             font=("Arial", 12)
+            self.tabs.tab("AR"),
+            text="Anti-Recoil not available yet.",
+            text_color="white",
+            font=("Arial", 12)
         )
         self.antiRecoilDescription.pack()
 
@@ -273,7 +279,7 @@ class MainWindow(ctk.CTk):
 
         self.yyStatusFrame = ctk.CTkFrame(self.tabs.tab("YY"), fg_color="#191919")
 
-        self.yyEnabledLabel = ctk.CTkLabel(self.yyStatusFrame, text="Is Enabled?")
+        self.yyEnabledLabel = ctk.CTkLabel(self.yyStatusFrame, text="Is Enabled?", text_color="white")
         self.yyEnabledLabel.pack(side=RIGHT, padx=(0, 5))
 
         self.yyEnabledSwitchVar = ctk.StringVar(value="on")
@@ -297,7 +303,7 @@ class MainWindow(ctk.CTk):
 
         self.yyActivatorKeyVar = ctk.StringVar(value=self.yyActivatorKey)
 
-        self.yyActivatorKeyLabel = ctk.CTkLabel(self.tabs.tab("YY"), text="Activator Key, e.g. e")
+        self.yyActivatorKeyLabel = ctk.CTkLabel(self.tabs.tab("YY"), text="Activator Key, e.g. e", text_color="white")
         self.yyActivatorKeyLabel.pack(padx=5, anchor=W)
 
         self.yyActivatorKeyButton = ctk.CTkButton(
@@ -309,7 +315,8 @@ class MainWindow(ctk.CTk):
 
         self.yyWeaponSwapKeyVar = ctk.StringVar(value=self.yyWeaponSwapKey)
 
-        self.yyWeaponSwapKeyLabel = ctk.CTkLabel(self.tabs.tab("YY"), text="Weapon Swap Key, e.g. 1")
+        self.yyWeaponSwapKeyLabel = ctk.CTkLabel(self.tabs.tab("YY"), text="Weapon Swap Key, e.g. 1",
+                                                 text_color="white")
         self.yyWeaponSwapKeyLabel.pack(padx=5, anchor=W)
 
         self.yyWeaponSwapKeyButton = ctk.CTkButton(
@@ -321,13 +328,14 @@ class MainWindow(ctk.CTk):
 
         self.yyDelayVar = ctk.StringVar(value=self.yyDelay)
 
-        self.yyDelayLabel = ctk.CTkLabel(self.tabs.tab("YY"), text="Delay, e.g. 100")
+        self.yyDelayLabel = ctk.CTkLabel(self.tabs.tab("YY"), text="Delay, e.g. 100", text_color="white")
         self.yyDelayLabel.pack(padx=5, pady=(0, 5), anchor=W)
 
         self.yyDelayEntry = ctk.CTkEntry(
             self.tabs.tab("YY"),
             textvariable=self.yyDelayVar,
             fg_color="#171717",
+            text_color="white",
             border_width=1,
             border_color="#404040",
             corner_radius=5
