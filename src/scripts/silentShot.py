@@ -34,6 +34,8 @@ def GetForegroundWindowTitle() -> Optional[str]:
 def performSilentShot(x, y, button, pressed):
     global job, configuration, targetTitle, silentShotTimeBefore, silentShotTimeAfter, silentShotLethalKey, silentShotWeaponSwapKey, exitScope
 
+    print(GetForegroundWindowTitle())
+
     if GetForegroundWindowTitle() is not None and targetTitle in GetForegroundWindowTitle().replace("​",
                                                                                                     "") and pressed:
         configuration = configFile.getConfiguration()

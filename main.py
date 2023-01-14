@@ -11,6 +11,8 @@ if __name__ == '__main__':
     if path.exists("data/session.txt"):
         remove(path.join("data", "session.txt"))
 
+    configFile.testConfiguration()
+
     updateChecker = UpdateChecker()
     updateChecker.mainloop()
 
