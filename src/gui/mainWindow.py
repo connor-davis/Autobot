@@ -581,9 +581,9 @@ class MainWindow(ctk.CTk):
         self.configuration.set("yy", "delay", self.yyDelayVar.get())
 
         if self.optionMenuOne.get() == "Modern Warfare":
-            self.configuration.set("settings", "targetGame", "Modern Warfare")
+            self.configuration.set("settings", "targetGame", "Call of Duty®: Modern Warfare®")
         else:
-            self.configuration.set("settings", "targetGame", "HQ")
+            self.configuration.set("settings", "targetGame", "Call of Duty®: HQ")
 
         with open("data/configuration.yml", "w") as config:
             self.configuration.write(config)
