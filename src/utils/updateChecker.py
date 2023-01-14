@@ -12,7 +12,6 @@ from dotenv import load_dotenv
 
 import src.utils.configFile as configFile
 
-ctk.set_appearance_mode("System")
 ctk.set_default_color_theme("green")
 
 load_dotenv()

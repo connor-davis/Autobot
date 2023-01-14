@@ -11,7 +11,6 @@ from src.scripts.yy import *
 import src.utils.configFile as configFile
 from src.utils.beeper import *
 
-ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
 
 
@@ -590,28 +589,6 @@ class MainWindow(ctk.CTk):
 
             config.flush()
             config.close()
-
-        print("Uninitializing scripts.")
-
-        if self.configuration.get("silentshot", "enabled") == "0":
-            uninitializeSilentShot()
-
-        if self.configuration.get("slidecancel", "enabled") == "0":
-            uninitializeSlideCancel()
-
-        if self.configuration.get("yy", "enabled") == "0":
-            uninitializeYY()
-
-        print("Initializing scripts.")
-
-        if self.configuration.get("silentshot", "enabled") == "1":
-            initializeSilentShot()
-
-        if self.configuration.get("slidecancel", "enabled") == "1":
-            initializeSlideCancel()
-
-        if self.configuration.get("yy", "enabled") == "1":
-            initializeYY()
 
         self.update_idletasks()
         self.update()

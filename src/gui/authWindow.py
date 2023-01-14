@@ -9,7 +9,6 @@ from PIL import Image
 
 import src.utils.configFile as configFile
 
-ctk.set_appearance_mode("dark")
 ctk.set_default_color_theme("green")
 
 userHWID = str(subprocess.check_output('wmic csproduct get uuid'), 'utf-8').split('\n')[1].strip()
@@ -146,11 +145,6 @@ class AuthWindow(ctk.CTk):
             authFile.flush()
             authFile.close()
 
-            sessionFile = open("data/session.txt", "w")
-            sessionFile.write(authData["jwt"])
-            sessionFile.flush()
-            sessionFile.close()
-
             userId = authData["user"]["id"]
 
             HEADERS = {"Authorization": "Bearer %s" % authData["jwt"]}
@@ -182,6 +176,11 @@ class AuthWindow(ctk.CTk):
                             okButton = ctk.CTkButton(dialogFrame, text="Ok", command=dialog.destroy)
                             okButton.pack(side=RIGHT, padx=(10, 20), pady=(0, 20))
                         else:
+                            sessionFile = open("data/session.txt", "w")
+                            sessionFile.write(authData["jwt"])
+                            sessionFile.flush()
+                            sessionFile.close()
+
                             self.destroy()
                     else:
                         dialog = ctk.CTkToplevel(self)

@@ -1,17 +1,12 @@
 import threading
 import time
 from ctypes import windll, create_unicode_buffer
-from os import path
 from typing import Optional
 
-import customtkinter as ctk
 import pydirectinput
-from pynput import mouse
-from pynput.mouse import Button
 from pynput import keyboard
 
 import src.utils.configFile as configFile
-from src.utils.beeper import beep
 
 configuration = configFile.getConfiguration()
 
@@ -25,6 +20,7 @@ doYY = False
 job = None
 listener = None
 
+
 def GetForegroundWindowTitle() -> Optional[str]:
     hWnd = windll.user32.GetForegroundWindow()
     length = windll.user32.GetWindowTextLengthW(hWnd)
@@ -35,6 +31,7 @@ def GetForegroundWindowTitle() -> Optional[str]:
         return buf.value
     else:
         return None
+
 
 def performYY():
     global job, targetTitle, configuration, yyEnabled, yyActivatorKey, yyWeaponSwapKey, yyDelay, doYY
@@ -54,7 +51,7 @@ def performYY():
             pydirectinput.keyDown("1")
             time.sleep(0.01)
             pydirectinput.keyUp("1")
-            time.sleep(0.1)
+            time.sleep(int(yyDelay) / 1000)
 
 
 def handleYYActivate(key):
