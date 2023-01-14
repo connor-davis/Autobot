@@ -79,6 +79,8 @@ def initializeYY():
     listener = keyboard.Listener(on_press=handleYYActivate)
     listener.start()
 
+    print("Initialized YY")
+
 
 def uninitializeYY():
     global listener, job
@@ -87,3 +89,5 @@ def uninitializeYY():
         listener.stop()
         listener = None
         job = None
+
+    print("Uninitialized YY.")

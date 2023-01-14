@@ -63,12 +63,8 @@ class MainWindow(ctk.CTk):
 
         self.silentShotEnabledLabel = ctk.CTkLabel(self.statusFrame, text="Is Enabled?", text_color="white")
         self.silentShotEnabledLabel.pack(side=RIGHT, padx=(0, 5))
-        self.silentShotSwitchVar = ctk.StringVar(value="on")
 
-        if self.silentShotEnabled:
-            self.silentShotSwitchVar.set("on")
-        else:
-            self.silentShotSwitchVar.set("off")
+        self.silentShotSwitchVar = ctk.StringVar(value="off")
 
         self.slideCancelEnabledSwitch = ctk.CTkSwitch(
             master=self.statusFrame,
@@ -98,7 +94,8 @@ class MainWindow(ctk.CTk):
 
         self.silentShotWeaponSwapKeyVar = ctk.StringVar(value=self.silentShotWeaponSwapKey)
 
-        self.silentShotWeaponSwapKeyLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Weapon Swap Key, e.g. 1", text_color="white")
+        self.silentShotWeaponSwapKeyLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Weapon Swap Key, e.g. 1",
+                                                         text_color="white")
         self.silentShotWeaponSwapKeyLabel.pack(padx=5, anchor=W)
 
         self.silentShotWeaponSwapKeyButton = ctk.CTkButton(
@@ -111,7 +108,8 @@ class MainWindow(ctk.CTk):
 
         self.silentShotTimeBeforeVar = ctk.StringVar(value=self.silentShotTimeBefore)
 
-        self.silentShotTimeBeforeLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Time Before, e.g. 1", text_color="white")
+        self.silentShotTimeBeforeLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Time Before, e.g. 1",
+                                                      text_color="white")
         self.silentShotTimeBeforeLabel.pack(padx=5, pady=(0, 5), anchor=W)
 
         self.silentShotTimeBeforeEntry = ctk.CTkEntry(
@@ -127,7 +125,8 @@ class MainWindow(ctk.CTk):
 
         self.silentShotTimeAfterVar = ctk.StringVar(value=self.silentShotTimeAfter)
 
-        self.silentShotTimeAfterLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Time After, e.g. 140", text_color="white")
+        self.silentShotTimeAfterLabel = ctk.CTkLabel(self.tabs.tab("SS"), text="Time After, e.g. 140",
+                                                     text_color="white")
         self.silentShotTimeAfterLabel.pack(padx=5, pady=(0, 5), anchor=W)
 
         self.silentShotTimeAfterEntry = ctk.CTkEntry(
@@ -145,6 +144,7 @@ class MainWindow(ctk.CTk):
 
         if self.exitScopeAfterSilentShot:
             self.silentShotExitScopeSwitchVar.set("on")
+            initializeSilentShot()
         else:
             self.silentShotExitScopeSwitchVar.set("off")
 
@@ -173,12 +173,8 @@ class MainWindow(ctk.CTk):
 
         self.slideCancelEnabledLabel = ctk.CTkLabel(self.slideCancelStatusFrame, text="Is Enabled?", text_color="white")
         self.slideCancelEnabledLabel.pack(side=RIGHT, padx=(0, 5))
-        self.slideCancelSwitchVar = ctk.StringVar(value="on")
 
-        if self.silentShotEnabled:
-            self.slideCancelSwitchVar.set("on")
-        else:
-            self.slideCancelSwitchVar.set("off")
+        self.slideCancelSwitchVar = ctk.StringVar(value="off")
 
         self.slideCancelEnabledSwitch = ctk.CTkSwitch(
             master=self.slideCancelStatusFrame,
@@ -194,7 +190,8 @@ class MainWindow(ctk.CTk):
 
         self.slideCancelActivatorKeyVar = ctk.StringVar(value=self.slideCancelActivatorKey)
 
-        self.slideCancelActivatorKeyLabel = ctk.CTkLabel(self.tabs.tab("SC"), text="Activator Key, e.g. c", text_color="white")
+        self.slideCancelActivatorKeyLabel = ctk.CTkLabel(self.tabs.tab("SC"), text="Activator Key, e.g. c",
+                                                         text_color="white")
         self.slideCancelActivatorKeyLabel.pack(padx=5, anchor=W)
 
         self.slideCancelActivatorKeyButton = ctk.CTkButton(
@@ -220,7 +217,8 @@ class MainWindow(ctk.CTk):
 
         self.slideCancelCancelKeyVar = ctk.StringVar(value=self.slideCancelCancelKey)
 
-        self.slideCancelCancelKeyLabel = ctk.CTkLabel(self.tabs.tab("SC"), text="Cancel Key, e.g. space", text_color="white")
+        self.slideCancelCancelKeyLabel = ctk.CTkLabel(self.tabs.tab("SC"), text="Cancel Key, e.g. space",
+                                                      text_color="white")
         self.slideCancelCancelKeyLabel.pack(padx=5, anchor=W)
 
         self.slideCancelCancelKeyButton = ctk.CTkButton(
@@ -282,12 +280,7 @@ class MainWindow(ctk.CTk):
         self.yyEnabledLabel = ctk.CTkLabel(self.yyStatusFrame, text="Is Enabled?", text_color="white")
         self.yyEnabledLabel.pack(side=RIGHT, padx=(0, 5))
 
-        self.yyEnabledSwitchVar = ctk.StringVar(value="on")
-
-        if self.yyEnabled:
-            self.yyEnabledSwitchVar.set("on")
-        else:
-            self.yyEnabledSwitchVar.set("off")
+        self.yyEnabledSwitchVar = ctk.StringVar(value="off")
 
         self.yyEnabledSwitch = ctk.CTkSwitch(
             master=self.yyStatusFrame,
@@ -351,6 +344,12 @@ class MainWindow(ctk.CTk):
             dynamic_resizing=True,
             values=["Modern Warfare", "Modern Warfare 2"]
         )
+
+        if targetTitle == "Call of Duty®: Modern Warfare®":
+            self.optionMenuOne.set("Modern Warfare")
+        else:
+            self.optionMenuOne.set("Modern Warfare 2")
+
         self.optionMenuOne.pack(fill=X)
 
         self.appVersion = ctk.CTkLabel(self.tabs.tab("Settings"),
@@ -570,6 +569,17 @@ class MainWindow(ctk.CTk):
     def applyChanges(self):
         self.configuration = configFile.getConfiguration()
 
+        self.configuration.set("silentshot", "enabled", '0')
+        self.silentShotSwitchVar.set("off")
+        self.configuration.set("slidecancel", "enabled", '0')
+        self.slideCancelSwitchVar.set("off")
+        self.configuration.set("yy", "enabled", '0')
+        self.yyEnabledSwitchVar.set("off")
+
+        uninitializeYY()
+        uninitializeSlideCancel()
+        uninitializeSilentShot()
+
         self.configuration.set("silentshot", "enabled", self.silentShotSwitchVar.get() == "on")
         self.configuration.set("silentshot", "lethalKey", self.silentShotLethalKeyVar.get())
         self.configuration.set("silentshot", "weaponSwapKey", self.silentShotWeaponSwapKeyVar.get())
@@ -590,13 +600,10 @@ class MainWindow(ctk.CTk):
         if self.optionMenuOne.get() == "Modern Warfare":
             self.configuration.set("settings", "targetGame", "Call of Duty®: Modern Warfare®")
         else:
-            self.configuration.set("settings", "targetGame", "Call of Duty®: HQ")
+            self.configuration.set("settings", "targetGame", "Call of Duty® HQ")
 
         with open("data/configuration.yml", "w") as config:
             self.configuration.write(config)
 
             config.flush()
             config.close()
-
-        self.update_idletasks()
-        self.update()
