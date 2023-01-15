@@ -14,6 +14,7 @@ ctk.set_default_color_theme("green")
 
 userHWID = getUserHWID()
 
+print(userHWID)
 
 class AuthWindow(ctk.CTk):
     def __init__(self):
