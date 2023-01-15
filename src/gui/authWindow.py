@@ -6,12 +6,13 @@ from tkinter.constants import *
 import customtkinter as ctk
 import requests
 from PIL import Image
+from src.utils.userHWID import getUserHWID
 
 import src.utils.configFile as configFile
 
 ctk.set_default_color_theme("green")
 
-userHWID = str(subprocess.check_output('wmic csproduct get uuid'), 'utf-8').split('\n')[1].strip()
+userHWID = getUserHWID()
 
 
 class AuthWindow(ctk.CTk):
