@@ -3,6 +3,7 @@ from tkinter.constants import *
 
 import customtkinter as ctk
 
+from src.scripts.antiRecoil import AntiRecoil
 from src.scripts.silentShot import *
 from src.scripts.slideCancel import *
 from src.scripts.yy import *
@@ -17,6 +18,7 @@ class MainWindow(ctk.CTk):
 
         self.keyboardListener = None
         self.keyboard = keyboard
+        self.antiRecoil = AntiRecoil()
 
         self.configuration = configFile.getConfiguration()
 
@@ -31,6 +33,11 @@ class MainWindow(ctk.CTk):
         self.slideCancelActivatorKey = self.configuration.get("slidecancel", "activatorKey")
         self.slideCancelSlideKey = self.configuration.get("slidecancel", "slideKey")
         self.slideCancelCancelKey = self.configuration.get("slidecancel", "cancelKey")
+
+        self.antiRecoilEnabled = self.configuration.get("antirecoil", "enabled")
+        self.antiRecoilToggleKey = self.configuration.get("antirecoil", "toggleKey")
+        self.antiRecoilVerticalStrength = self.configuration.get("antirecoil", "verticalStrength")
+        self.antiRecoilHorizontalStrength = self.configuration.get("antirecoil", "horizontalStrength")
 
         self.yyEnabled = self.configuration.getboolean("yy", "enabled")
         self.yyActivatorKey = self.configuration.get("yy", "activatorKey")
@@ -257,13 +264,70 @@ class MainWindow(ctk.CTk):
                                             font=("Arial", 16, "bold"))
         self.antiRecoilLabel.pack()
 
-        self.antiRecoilDescription = ctk.CTkLabel(
-            self.tabs.tab("AR"),
-            text="Anti-Recoil not available yet.",
-            text_color="white",
-            font=("Arial", 12)
+        self.antiRecoilStatusFrame = ctk.CTkFrame(self.tabs.tab("AR"), fg_color="#191919")
+
+        self.antiRecoilEnabledLabel = ctk.CTkLabel(self.antiRecoilStatusFrame, text="Is Enabled?", text_color="white")
+        self.antiRecoilEnabledLabel.pack(side=RIGHT, padx=(0, 5))
+
+        self.antiRecoilEnabledSwitchVar = ctk.StringVar(value="off")
+
+        self.antiRecoilEnabledSwitch = ctk.CTkSwitch(
+            master=self.antiRecoilStatusFrame,
+            text="",
+            command=self.antiRecoilSwitchEvent,
+            variable=self.antiRecoilEnabledSwitchVar,
+            onvalue="on",
+            offvalue="off"
         )
-        self.antiRecoilDescription.pack()
+        self.antiRecoilEnabledSwitch.pack(side=LEFT, anchor=W)
+
+        self.antiRecoilStatusFrame.pack(fill=X)
+
+        self.antiRecoilToggleKeyVar = ctk.StringVar(value=self.antiRecoilToggleKey)
+
+        self.antiRecoilToggleKeyLabel = ctk.CTkLabel(self.tabs.tab("AR"), text="Toggle Key, e.g. g", text_color="white")
+        self.antiRecoilToggleKeyLabel.pack(padx=5, anchor=W)
+
+        self.antiRecoilToggleKeyButton = ctk.CTkButton(
+            self.tabs.tab("AR"),
+            textvariable=self.antiRecoilToggleKeyVar,
+            command=self.getAntiRecoilToggleKey
+        )
+        self.antiRecoilToggleKeyButton.pack(pady=10, padx=5, fill=X)
+
+        self.antiRecoilVSVar = ctk.StringVar(value=self.antiRecoilVerticalStrength)
+
+        self.antiRecoilVSLabel = ctk.CTkLabel(self.tabs.tab("AR"), text="Vertical Strength, e.g. 5",
+                                              text_color="white")
+        self.antiRecoilVSLabel.pack(padx=5, pady=(0, 5), anchor=W)
+
+        self.antiRecoilVSEntry = ctk.CTkEntry(
+            self.tabs.tab("AR"),
+            textvariable=self.antiRecoilVSVar,
+            fg_color="#171717",
+            text_color="white",
+            border_width=1,
+            border_color="#404040",
+            corner_radius=5
+        )
+        self.antiRecoilVSEntry.pack(padx=5, pady=(0, 5), fill=X)
+
+        self.antiRecoilHSVar = ctk.StringVar(value=self.antiRecoilHorizontalStrength)
+
+        self.antiRecoilHSLabel = ctk.CTkLabel(self.tabs.tab("AR"), text="Horizontal Strength, e.g. 4",
+                                              text_color="white")
+        self.antiRecoilHSLabel.pack(padx=5, pady=(0, 5), anchor=W)
+
+        self.antiRecoilHSEntry = ctk.CTkEntry(
+            self.tabs.tab("AR"),
+            textvariable=self.antiRecoilHSVar,
+            fg_color="#171717",
+            text_color="white",
+            border_width=1,
+            border_color="#404040",
+            corner_radius=5
+        )
+        self.antiRecoilHSEntry.pack(padx=5, pady=(0, 5), fill=X)
 
         # YY
 
@@ -507,6 +571,52 @@ class MainWindow(ctk.CTk):
             config.flush()
             config.close()
 
+    def getAntiRecoilToggleKey(self):
+        if self.keyboardListener is not None:
+            self.keyboardListener = None
+
+        self.keyboardListener = self.keyboard.Listener(on_press=self.handleAntiRecoilToggleKeyPress)
+        self.keyboardListener.start()
+
+    def handleAntiRecoilToggleKeyPress(self, key):
+        keyBind = "{0}".format(key).replace("'", "").replace("Key.", "")
+
+        self.antiRecoilToggleKeyVar.set(keyBind)
+
+        self.update_idletasks()
+        self.update()
+
+        self.keyboardListener.stop()
+
+    def antiRecoilSwitchEvent(self):
+        self.configuration = configFile.getConfiguration()
+
+        if self.antiRecoilEnabledSwitch.get() == "on":
+            self.configuration.set("antirecoil", "enabled", '1')
+            self.antiRecoil = AntiRecoil()
+            self.antiRecoil.enabled = False
+            self.antiRecoil.listener = None
+            self.antiRecoil.job = None
+            self.antiRecoil.start()
+
+            beep(200, 100)
+            beep(200, 100)
+        else:
+            self.configuration.set("antirecoil", "enabled", '0')
+            self.antiRecoil.stop()
+            self.antiRecoil.enabled = False
+            self.antiRecoil.listener = None
+            self.antiRecoil.job = None
+            self.antiRecoil = None
+
+            beep(200, 100)
+
+        with open("data/configuration.yml", "w") as config:
+            self.configuration.write(config)
+
+            config.flush()
+            config.close()
+
     def getYYActivatorKey(self):
         if self.keyboardListener is not None:
             self.keyboardListener = None
@@ -573,26 +683,36 @@ class MainWindow(ctk.CTk):
         self.silentShotSwitchVar.set("off")
         self.configuration.set("slidecancel", "enabled", '0')
         self.slideCancelSwitchVar.set("off")
+        self.configuration.set("antirecoil", "enabled", "0")
+        self.antiRecoilEnabledSwitchVar.set("off")
         self.configuration.set("yy", "enabled", '0')
         self.yyEnabledSwitchVar.set("off")
 
         uninitializeYY()
+        
+        self.antiRecoil.stop()
+        self.antiRecoil.enabled = False
+        self.antiRecoil.listener = None
+        self.antiRecoil.job = None
+        self.antiRecoil = None
+
         uninitializeSlideCancel()
         uninitializeSilentShot()
 
-        self.configuration.set("silentshot", "enabled", self.silentShotSwitchVar.get() == "on")
         self.configuration.set("silentshot", "lethalKey", self.silentShotLethalKeyVar.get())
         self.configuration.set("silentshot", "weaponSwapKey", self.silentShotWeaponSwapKeyVar.get())
         self.configuration.set("silentshot", "timeBefore", self.silentShotTimeBeforeVar.get())
         self.configuration.set("silentshot", "timeAfter", self.silentShotTimeAfterVar.get())
         self.configuration.set("silentshot", "exitScope", self.silentShotExitScopeSwitchVar.get() == "on")
 
-        self.configuration.set("slidecancel", "enabled", self.slideCancelSwitchVar.get() == "on")
         self.configuration.set("slidecancel", "activatorKey", self.slideCancelActivatorKeyVar.get())
         self.configuration.set("slidecancel", "slideKey", self.slideCancelSlideKeyVar.get())
         self.configuration.set("slidecancel", "cancelKey", self.slideCancelCancelKeyVar.get())
 
-        self.configuration.set("yy", "enabled", self.yyEnabledSwitchVar.get() == "on")
+        self.configuration.set("antirecoil", "toggleKey", self.antiRecoilToggleKeyVar.get())
+        self.configuration.set("antirecoil", "verticalStrength", self.antiRecoilVSVar.get())
+        self.configuration.set("antirecoil", "horizontalStrength", self.antiRecoilHSVar.get())
+
         self.configuration.set("yy", "activatorKey", self.yyActivatorKeyVar.get())
         self.configuration.set("yy", "weaponSwapKey", self.yyWeaponSwapKeyVar.get())
         self.configuration.set("yy", "delay", self.yyDelayVar.get())

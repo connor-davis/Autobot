@@ -1,5 +1,4 @@
 import configparser
-import time
 from os import path
 
 import yaml
@@ -22,6 +21,12 @@ if not path.exists("data/configuration.yml"):
             "slideKey": "c",
             "cancelKey": "space"
         },
+        "antiRecoil": {
+            "enabled": "0",
+            "toggleKey": "g",
+            "verticalStrength": "5",
+            "horizontalStrength": "4"
+        },
         "yy": {
             "enabled": "0",
             "activatorKey": "e",
@@ -30,7 +35,7 @@ if not path.exists("data/configuration.yml"):
         },
         "settings": {
             "targetGame": "Modern Warfare",
-            "version": "0.2.5"
+            "version": "0.2.6"
         }
     }
 
@@ -60,6 +65,12 @@ class YamlConfig:
                     "slideKey": "c",
                     "cancelKey": "space"
                 },
+                "antiRecoil": {
+                    "enabled": "0",
+                    "toggleKey": "g",
+                    "verticalStrength": "5",
+                    "horizontalStrength": "4"
+                },
                 "yy": {
                     "enabled": "0",
                     "activatorKey": "e",
@@ -68,7 +79,7 @@ class YamlConfig:
                 },
                 "settings": {
                     "targetGame": "Modern Warfare",
-                    "version": "0.2.5"
+                    "version": "0.2.6"
                 }
             }
 
@@ -130,6 +141,12 @@ def testConfiguration():
             "slideKey": "c",
             "cancelKey": "space"
         },
+        "antiRecoil": {
+            "enabled": "0",
+            "toggleKey": "g",
+            "verticalStrength": "5",
+            "horizontalStrength": "4"
+        },
         "yy": {
             "enabled": "0",
             "activatorKey": "e",
@@ -138,7 +155,7 @@ def testConfiguration():
         },
         "settings": {
             "targetGame": "Modern Warfare",
-            "version": "0.2.5"
+            "version": "0.2.6"
         }
     }
 
