@@ -30,7 +30,7 @@ if not path.exists("data/configuration.yml"):
         },
         "settings": {
             "targetGame": "Modern Warfare",
-            "version": "0.2.4"
+            "version": "0.2.5"
         }
     }
 
@@ -68,7 +68,7 @@ class YamlConfig:
                 },
                 "settings": {
                     "targetGame": "Modern Warfare",
-                    "version": "0.2.4"
+                    "version": "0.2.5"
                 }
             }
 
@@ -138,7 +138,7 @@ def testConfiguration():
         },
         "settings": {
             "targetGame": "Modern Warfare",
-            "version": "0.2.4"
+            "version": "0.2.5"
         }
     }
 
