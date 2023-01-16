@@ -1,4 +1,10 @@
-import subprocess
+import os
+import win32security
+
 
 def getUserHWID():
-    return str(subprocess.check_output('wmic csproduct get uuid')).split('\\r\\n')[1].strip('\\r').strip()
+    winuser = os.getlogin()
+    sid = win32security.LookupAccountName(None, winuser)[0]
+    hwid = win32security.ConvertSidToStringSid(sid)
+
+    return hwid
